@@ -2,4 +2,4 @@ spring:
   application:
     name: board-service
   profiles:
-    active: local
+    default: local
