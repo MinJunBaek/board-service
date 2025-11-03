@@ -5,12 +5,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "member")
+@Entity(name = "members")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
   @Column(length = 100, nullable = false)
@@ -28,4 +29,14 @@ public class Member extends BaseEntity {
   @Column(length = 50, nullable = false)
   @Enumerated(EnumType.STRING)
   private MemberRole memberRole;
+
+  public static Member of(String email, String password, String name, String address) {
+    Member member = new Member();
+    member.email = email;
+    member.password = password;
+    member.name = name;
+    member.address = address;
+    member.memberRole = MemberRole.MEMBER;
+    return member;
+  }
 }
