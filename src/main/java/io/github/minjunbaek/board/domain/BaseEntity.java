@@ -27,12 +27,12 @@ public class BaseEntity {
 
   private LocalDateTime deletedAt;
 
-  public LocalDateTime memberDeleted() {
+  public LocalDateTime deletedAt() {
     this.deletedAt = LocalDateTime.now();
     return deletedAt;
   }
 
-  public boolean isDeleted() {
-    return deletedAt == null; // 삭제가 되었을시 true 그렇지 않으면 false
+  public boolean isActive() {
+    return deletedAt == null; // 상태가 활성중이면 True, 그렇지 않으면 false
   }
 }
