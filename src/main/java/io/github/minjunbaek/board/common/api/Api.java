@@ -12,7 +12,7 @@ public class Api<T> {
   private final String description; // 상태 메시지
   private final T data; // 데이터
 
-  public static <T> Api<T> success(String statusCode, String description) {
+  public static Api<Void> success(String statusCode, String description) {
     return Api.of(true, statusCode, description, null);
   }
 
@@ -20,7 +20,7 @@ public class Api<T> {
     return Api.of(true, statusCode, description, data);
   }
 
-  public static <T> Api<T> failure(String statusCode, String description) {
+  public static Api<Void> failure(String statusCode, String description) {
     return Api.of(false, statusCode, description, null);
   }
 

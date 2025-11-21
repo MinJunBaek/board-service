@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.user.controller.dto;
+package io.github.minjunbaek.board.member.controller.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

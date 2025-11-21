@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.user.repository.entity;
+package io.github.minjunbaek.board.member.repository.entity;
 
 public enum MemberRole {
   ADMIN("관리자", 0),

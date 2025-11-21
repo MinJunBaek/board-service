@@ -1,6 +1,6 @@
-package io.github.minjunbaek.board.user.repository;
+package io.github.minjunbaek.board.member.repository;
 
-import io.github.minjunbaek.board.user.repository.entity.Member;
+import io.github.minjunbaek.board.member.repository.entity.Member;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

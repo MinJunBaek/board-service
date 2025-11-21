@@ -36,6 +36,8 @@ public class SecurityConfig {
           .requestMatchers("/members/join-form", "/members/register").permitAll()
           // 로그인은 익명 허용
           .requestMatchers("/members/login").permitAll()
+          // 내 정보를 조회
+          .requestMatchers("/members/me").authenticated()
           // 그 외는 인증
           .anyRequest().authenticated()
       )

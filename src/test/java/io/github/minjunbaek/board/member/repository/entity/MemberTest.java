@@ -1,6 +1,4 @@
-package io.github.minjunbaek.board.user.repository.entity;
-
-import static org.junit.jupiter.api.Assertions.*;
+package io.github.minjunbaek.board.member.repository.entity;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

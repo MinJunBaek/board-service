@@ -1,5 +1,8 @@
-package io.github.minjunbaek.board.user.controller.dto;
+package io.github.minjunbaek.board.member.controller.dto;
 
+import lombok.Getter;
+
+@Getter
 public class LoginUserSessionDto {
   private Long id;
   private String email;

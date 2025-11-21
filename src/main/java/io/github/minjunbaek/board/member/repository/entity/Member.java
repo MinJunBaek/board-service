@@ -1,18 +1,23 @@
-package io.github.minjunbaek.board.user.repository.entity;
+package io.github.minjunbaek.board.member.repository.entity;
 
 import io.github.minjunbaek.board.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.util.Collection;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "members")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements UserDetails {
 
   @Column(length = 100, nullable = false)
   private String email;
@@ -38,5 +43,36 @@ public class Member extends BaseEntity {
     member.address = address;
     member.memberRole = MemberRole.MEMBER;
     return member;
+  }
+
+  // === UserDetails 구현부 ===
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority(memberRole.name()));
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 }
