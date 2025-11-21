@@ -18,16 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService implements UserDetailsService {
+public class MemberService{
 
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
-
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Member member = getMemberByEmailOrThrow(username);
-    return member;
-  }
 
   @Transactional
   public String register(MemberRegisterDto memberRegisterDto) {
@@ -40,26 +34,5 @@ public class MemberService implements UserDetailsService {
 
     memberRepository.save(newMember);
     return "저장완료";
-  }
-
-  @Transactional(readOnly = true)
-  public LoginUserSessionDto memberLogin(MemberLoginRequestDto memberLoginRequestDto, HttpSession httpSession) {
-    Member member = getMemberByEmailOrThrow(memberLoginRequestDto.getEmail());
-
-    if (!passwordEncoder.matches(memberLoginRequestDto.getPassword(), member.getPassword())) {
-      throw new ApiException(MemberErrorCode.LOGIN_FAILED);
-    }
-
-    LoginUserSessionDto sessionDto = LoginUserSessionDto.of(member.getId(), member.getEmail(), member.getName());
-
-    httpSession.setAttribute("loginUser", sessionDto);
-
-    return sessionDto;
-  }
-
-  private Member getMemberByEmailOrThrow(String email) {
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.LOGIN_FAILED));
-    return member;
   }
 }

@@ -1,5 +1,7 @@
 package io.github.minjunbaek.board.config;
 
+import io.github.minjunbaek.board.security.MemberUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,7 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final MemberUserDetailsService memberUserDetailsService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -23,32 +28,31 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
     // 세션 기반
     httpSecurity
-      .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-      // 요청 인가
-      .authorizeHttpRequests(auth -> auth
-          // Swagger(OpenAPI) & Scalar
-          .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").permitAll()
-          // H2 콘솔
-          .requestMatchers("/h2-console/**").permitAll()
-          // 메인 페이지 익명 허용
-          .requestMatchers("/").permitAll()
-          // 회원가입은 익명 허용
-          .requestMatchers("/members/join-form", "/members/register").permitAll()
-          // 로그인은 익명 허용
-          .requestMatchers("/members/login").permitAll()
-          // 내 정보를 조회
-          .requestMatchers("/members/me").authenticated()
-          // 그 외는 인증
-          .anyRequest().authenticated()
-      )
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // 필요할 때 세션 생성 (기본)
+            .maximumSessions(1) // 동시 세션 수 제한(Optional)
+        )
 
-      // 기본 로그인/로그아웃 폼 사용
-      .formLogin(Customizer.withDefaults())
-      .logout(Customizer.withDefaults())
+        // 요청 인가
+        .authorizeHttpRequests(auth -> auth
+            // Swagger(OpenAPI) & Scalar
+            .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").permitAll()
+            // H2 콘솔
+            .requestMatchers("/h2-console/**").permitAll()
+            // 익명 허용(메인페이지, 회원가입)
+            .requestMatchers("/", "/members/join-form", "/members/register").permitAll()
+            // 그 외는 인증
+            .anyRequest().authenticated()
+        )
+        .userDetailsService(memberUserDetailsService)
 
-      // H2 콘솔용 헤더/CSRF 예외
-      .headers(h -> h.frameOptions(frame -> frame.disable()))
-      .csrf(csrf -> csrf.disable());
+        // 기본 로그인/로그아웃 폼 사용
+        .formLogin(Customizer.withDefaults())
+        .logout(Customizer.withDefaults())
+
+        // H2 콘솔용 헤더/CSRF 예외
+        .headers(h -> h.frameOptions(frame -> frame.disable()))
+        .csrf(csrf -> csrf.disable());
 
     return httpSecurity.build();
   }

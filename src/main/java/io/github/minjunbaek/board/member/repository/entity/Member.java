@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity(name = "members")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity implements UserDetails {
+public class Member extends BaseEntity {
 
   @Column(length = 100, nullable = false)
   private String email;
@@ -43,36 +43,5 @@ public class Member extends BaseEntity implements UserDetails {
     member.address = address;
     member.memberRole = MemberRole.MEMBER;
     return member;
-  }
-
-  // === UserDetails 구현부 ===
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(memberRole.name()));
-  }
-
-  @Override
-  public String getUsername() {
-    return email;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
   }
 }
