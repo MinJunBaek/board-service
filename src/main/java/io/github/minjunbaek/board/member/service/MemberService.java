@@ -2,16 +2,11 @@ package io.github.minjunbaek.board.member.service;
 
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
-import io.github.minjunbaek.board.member.controller.dto.LoginUserSessionDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberLoginRequestDto;
+import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.member.repository.MemberRepository;
 import io.github.minjunbaek.board.member.repository.entity.Member;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,4 +30,14 @@ public class MemberService{
     memberRepository.save(newMember);
     return "저장완료";
   }
+
+  @Transactional(readOnly = true)
+  public MemberInformationDto getMyInformation(String email) {
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+    return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
+        member.getMemberRole().toString());
+  }
+
 }

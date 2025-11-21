@@ -4,6 +4,7 @@ import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.member.controller.dto.LoginUserSessionDto;
+import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.member.service.MemberService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
@@ -31,10 +32,20 @@ public class MemberController {
     return ResponseEntity.status(201).body(Api.success("MEMBER_CREATED", result));
   }
 
-  // 아이디 및 패스워드 찾기
-  // 로그아웃
   // 내정보 조회
+  @GetMapping("/my-information")
+  public ResponseEntity<Api<MemberInformationDto>> myInformation(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+    if (memberPrincipal == null) {
+      throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+    }
+
+    MemberInformationDto informationDto = memberService.getMyInformation(memberPrincipal.getEmail());
+
+    return ResponseEntity.ok(Api.success("MY_INFORMATION", "내정보 조회", informationDto));
+  }
   // 내정보 수정
+  // 아이디 및 패스워드 찾기
   // 내 비밀번호 수정
   // 회원 탈퇴
 
