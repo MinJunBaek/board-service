@@ -26,13 +26,4 @@ public class BaseEntity {
   private LocalDateTime updatedAt;
 
   private LocalDateTime deletedAt;
-
-  public LocalDateTime deletedAt() {
-    this.deletedAt = LocalDateTime.now();
-    return deletedAt;
-  }
-
-  public boolean isActive() {
-    return deletedAt == null; // 상태가 활성중이면 True, 그렇지 않으면 false
-  }
 }

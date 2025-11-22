@@ -7,6 +7,7 @@ import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.member.controller.dto.MemberUnregisterDto;
 import io.github.minjunbaek.board.member.repository.MemberRepository;
 import io.github.minjunbaek.board.member.repository.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,19 @@ public class MemberService{
 
     memberRepository.save(newMember);
     return "저장완료";
+  }
+
+  @Transactional
+  public String unregister(Long memberId, MemberUnregisterDto memberUnregisterDto) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+    if (!passwordEncoder.matches(memberUnregisterDto.getPassword(), member.getPassword())) {
+      throw new ApiException(MemberErrorCode.LOGIN_FAILED);
+    }
+
+    memberRepository.delete(member);
+    return "탈퇴 성공";
   }
 
   @Transactional(readOnly = true)
@@ -73,5 +87,4 @@ public class MemberService{
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString());
   }
-
 }

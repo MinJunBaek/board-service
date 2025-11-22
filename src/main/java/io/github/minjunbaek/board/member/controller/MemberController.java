@@ -7,11 +7,17 @@ import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDt
 import io.github.minjunbaek.board.member.controller.dto.LoginUserSessionDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.member.controller.dto.MemberUnregisterDto;
 import io.github.minjunbaek.board.member.service.MemberService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +34,28 @@ public class MemberController {
 
   // 회원가입
   @PostMapping("/register")
-  public ResponseEntity<Api> register(@RequestBody @Validated MemberRegisterDto memberRegisterDto) {
+  public ResponseEntity<Api<Void>> register(@RequestBody @Validated MemberRegisterDto memberRegisterDto) {
     String result = memberService.register(memberRegisterDto);
     return ResponseEntity.status(201).body(Api.success("MEMBER_CREATED", result));
+  }
+
+  // 회원 탈퇴
+  @PostMapping("/unregister")
+  public ResponseEntity<Api<Void>> unregister(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      @Validated@RequestBody MemberUnregisterDto memberUnregisterDto,
+      HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse) {
+
+    Long memberId = memberPrincipal.getId();
+    String result = memberService.unregister(memberId, memberUnregisterDto);
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null) {
+      new SecurityContextLogoutHandler().logout(httpServletRequest,httpServletResponse, auth);
+    }
+
+    return ResponseEntity.ok(Api.success("MEMBER_DELETED", result));
   }
 
   // 내정보 조회
@@ -63,10 +88,6 @@ public class MemberController {
     return ResponseEntity.ok(Api.success("MY_INFORMATION_CHANGE", "내정보 수정", informationDto));
   }
 
-  // 아이디 및 패스워드 찾기
-  // 내 비밀번호 수정
-  // 회원 탈퇴
-
   // 현재 로그인된 유저 확인용 API
   @GetMapping("/me")
   public ResponseEntity<Api<LoginUserSessionDto>> getCurrentMember(
@@ -86,4 +107,6 @@ public class MemberController {
 
     return ResponseEntity.ok(body);
   }
+
+  // 아이디 및 패스워드 찾기
 }
