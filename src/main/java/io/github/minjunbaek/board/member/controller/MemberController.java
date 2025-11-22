@@ -3,6 +3,7 @@ package io.github.minjunbaek.board.member.controller;
 import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
+import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDto;
 import io.github.minjunbaek.board.member.controller.dto.LoginUserSessionDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
@@ -34,7 +35,7 @@ public class MemberController {
 
   // 내정보 조회
   @GetMapping("/my-information")
-  public ResponseEntity<Api<MemberInformationDto>> myInformation(
+  public ResponseEntity<Api<MemberInformationDto>> viewMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
     if (memberPrincipal == null) {
       throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
@@ -44,7 +45,24 @@ public class MemberController {
 
     return ResponseEntity.ok(Api.success("MY_INFORMATION", "내정보 조회", informationDto));
   }
+
   // 내정보 수정
+  @PostMapping("/my-information")
+  public ResponseEntity<Api<MemberInformationDto>> editMyInformation(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      @Validated @RequestBody EditInformationRequestDto requestDto) {
+
+    if (memberPrincipal == null) {
+      throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+    }
+
+    Long memberId = memberPrincipal.getId();
+
+    MemberInformationDto informationDto = memberService.editMyInformation(memberId, requestDto);
+
+    return ResponseEntity.ok(Api.success("MY_INFORMATION_CHANGE", "내정보 수정", informationDto));
+  }
+
   // 아이디 및 패스워드 찾기
   // 내 비밀번호 수정
   // 회원 탈퇴

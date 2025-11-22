@@ -1,7 +1,10 @@
 package io.github.minjunbaek.board.member.service;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
+import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.member.repository.MemberRepository;
@@ -36,6 +39,37 @@ public class MemberService{
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
+    return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
+        member.getMemberRole().toString());
+  }
+
+  @Transactional
+  public MemberInformationDto editMyInformation(Long id, EditInformationRequestDto requestDto) {
+    Member member = memberRepository.findById(id)
+        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+    // 현재 비밀번호 검증
+    if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+      throw new ApiException(MemberErrorCode.LOGIN_FAILED);
+    }
+
+    // 현재 비밀번호를 새 비밀번호로 교체
+    if (hasText(requestDto.getChangePassword())){
+      String changePassword = passwordEncoder.encode(requestDto.getChangePassword());
+      member.changePassword(changePassword);
+    }
+
+    // 변경할 이름이 있으면 변경
+    if (hasText(requestDto.getName())) {
+      member.changeName(requestDto.getName());
+    }
+
+    // 변경할 주소가 있으면 변경
+    if (hasText(requestDto.getAddress())) {
+      member.changeAddress(requestDto.getAddress());
+    }
+
+    // 결과
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString());
   }

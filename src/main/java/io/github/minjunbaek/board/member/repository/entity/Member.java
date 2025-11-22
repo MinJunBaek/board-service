@@ -39,4 +39,16 @@ public class Member extends BaseEntity {
     member.memberRole = MemberRole.MEMBER;
     return member;
   }
+
+  public void changePassword(String password) {
+    this.password = password;
+  }
+
+  public void changeName(String name) {
+    this.name = name;
+  }
+
+  public void changeAddress(String address) {
+    this.address = address;
+  }
 }
