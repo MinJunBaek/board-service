@@ -21,7 +21,7 @@ public class BoardService {
 
   // 게시판 생성
   public void createBoard(BoardRequestDto requestDto) {
-    Board board = Board.createBoard(requestDto.getBoardName());
+    Board board = Board.create(requestDto.getBoardName());
     boardRepository.save(board);
   }
 

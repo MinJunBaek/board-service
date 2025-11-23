@@ -1,10 +1,11 @@
 package io.github.minjunbaek.board.common.api;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(staticName = "of")
+@AllArgsConstructor(access = AccessLevel.PRIVATE, staticName = "of")
 public class Api<T> {
 
   private final boolean success; // 성공 여부(성공 true, 실패 false)

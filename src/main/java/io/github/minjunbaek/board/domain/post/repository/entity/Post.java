@@ -1,0 +1,66 @@
+package io.github.minjunbaek.board.domain.post.repository.entity;
+
+import io.github.minjunbaek.board.domain.BaseEntity;
+import io.github.minjunbaek.board.domain.board.repository.entity.Board;
+import io.github.minjunbaek.board.domain.member.repository.entity.Member;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+@Getter
+@Entity(name = "posts")
+@SQLDelete(sql = "UPDATE posts SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class Post extends BaseEntity {
+
+  @Column(length = 100, nullable = false)
+  private String title;
+
+  @Column(columnDefinition = "TEXT", nullable = false)
+  private String content;
+
+  private int likeCount;
+
+  private int viewCount;
+
+  @ManyToOne
+  @JoinColumn(name = "member_id")
+  private Member member;
+
+  @ManyToOne
+  @JoinColumn(name = "board_id")
+  private Board board;
+
+  public static Post create(String title, String content, Member member, Board board) {
+    Post post = new Post();
+    post.title = title;
+    post.content = content;
+    post.member = member;
+    post.board = board;
+    return post;
+  }
+
+  public void changeTitle(String title) {
+    this.title = title;
+  }
+
+  public void changeContent(String content) {
+    this.content = content;
+  }
+
+  public void changeBoard(Board board) {
+    this.board = board;
+  }
+
+  public void viewCount() {
+    this.viewCount++;
+  }
+
+  public void likeCount() {
+    this.likeCount++;
+  }
+}

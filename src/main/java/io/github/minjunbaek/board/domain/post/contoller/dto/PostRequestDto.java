@@ -1,0 +1,18 @@
+package io.github.minjunbaek.board.domain.post.contoller.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
+@Getter
+public class PostRequestDto {
+
+  @NotNull
+  private Long boardId;
+
+  @NotBlank
+  private String title;
+
+  @NotNull
+  private String content;
+}
