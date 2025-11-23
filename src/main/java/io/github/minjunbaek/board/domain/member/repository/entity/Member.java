@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.member.repository.entity;
+package io.github.minjunbaek.board.domain.member.repository.entity;
 
 import io.github.minjunbaek.board.domain.BaseEntity;
 import jakarta.persistence.Column;

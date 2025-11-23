@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.member.controller.dto;
+package io.github.minjunbaek.board.domain.member.controller.dto;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package io.github.minjunbaek.board.security;
 
-import io.github.minjunbaek.board.member.repository.entity.Member;
+import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

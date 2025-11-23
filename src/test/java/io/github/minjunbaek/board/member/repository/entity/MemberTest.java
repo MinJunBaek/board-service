@@ -1,5 +1,7 @@
 package io.github.minjunbaek.board.member.repository.entity;
 
+import io.github.minjunbaek.board.domain.member.repository.entity.Member;
+import io.github.minjunbaek.board.domain.member.repository.entity.MemberRole;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

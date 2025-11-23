@@ -2,8 +2,8 @@ package io.github.minjunbaek.board.security;
 
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
-import io.github.minjunbaek.board.member.repository.MemberRepository;
-import io.github.minjunbaek.board.member.repository.entity.Member;
+import io.github.minjunbaek.board.domain.member.repository.MemberRepository;
+import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

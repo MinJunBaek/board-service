@@ -1,14 +1,14 @@
-package io.github.minjunbaek.board.member.controller;
+package io.github.minjunbaek.board.domain.member.controller;
 
 import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
-import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDto;
-import io.github.minjunbaek.board.member.controller.dto.LoginUserSessionDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberUnregisterDto;
-import io.github.minjunbaek.board.member.service.MemberService;
+import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRequestDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.LoginUserSessionDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberUnregisterDto;
+import io.github.minjunbaek.board.domain.member.service.MemberService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

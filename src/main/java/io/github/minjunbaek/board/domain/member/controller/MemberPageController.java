@@ -1,6 +1,6 @@
-package io.github.minjunbaek.board.member.controller;
+package io.github.minjunbaek.board.domain.member.controller;
 
-import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

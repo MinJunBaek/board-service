@@ -1,15 +1,15 @@
-package io.github.minjunbaek.board.member.service;
+package io.github.minjunbaek.board.domain.member.service;
 
 import static org.springframework.util.StringUtils.hasText;
 
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
-import io.github.minjunbaek.board.member.controller.dto.EditInformationRequestDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberInformationDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberRegisterDto;
-import io.github.minjunbaek.board.member.controller.dto.MemberUnregisterDto;
-import io.github.minjunbaek.board.member.repository.MemberRepository;
-import io.github.minjunbaek.board.member.repository.entity.Member;
+import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRequestDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberUnregisterDto;
+import io.github.minjunbaek.board.domain.member.repository.MemberRepository;
+import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
