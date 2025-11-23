@@ -1,15 +1,64 @@
 package io.github.minjunbaek.board.domain.board.controller;
 
+import io.github.minjunbaek.board.common.api.Api;
+import io.github.minjunbaek.board.domain.board.controller.dto.BoardRequestDto;
+import io.github.minjunbaek.board.domain.board.controller.dto.BoardMultipleResponseDto;
+import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
+import io.github.minjunbaek.board.domain.board.service.BoardService;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/boards")
+@RequiredArgsConstructor
 public class BoardController {
 
-  // 게시판 생성
+  private final BoardService boardService;
 
-  // 게시판 조회
+  // 게시판 생성
+  @PostMapping
+  public ResponseEntity<Api<Void>> create(@Validated @RequestBody BoardRequestDto requestDto) {
+    boardService.createBoard(requestDto);
+    return ResponseEntity.ok(Api.success("BOARD_CREATE", "게시판 생성"));
+  }
+
+  // 게시판 조회(단일 조회)
+  @GetMapping("/{id}")
+  public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "id") Long boardId) {
+    BoardResponseDto responseDto = boardService.readBoard(boardId);
+    return ResponseEntity.ok(Api.success("BOARD_READ", "게시판 단일 조회", responseDto));
+  }
+
+  // 게시판 조회(다수 조회)
+  @GetMapping
+  public ResponseEntity<Api<List<BoardMultipleResponseDto>>> readAll() {
+    List<BoardMultipleResponseDto> boardList = boardService.readAllBoard();
+    return ResponseEntity.ok(Api.success("BOARD_LIST", "게시판 목록 조회", boardList));
+  }
 
   // 게시판 수정
+  @PatchMapping("/{id}")
+  public ResponseEntity<Api<BoardResponseDto>> editBoard(
+      @PathVariable(value = "id") Long boardId,
+      @Validated @RequestBody BoardRequestDto requestDto) {
+    BoardResponseDto responseDto = boardService.editBoard(boardId, requestDto);
+    return ResponseEntity.ok(Api.success("BOARD_EDIT", "게시판 수정", responseDto));
+  }
 
   // 게시판 삭제
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Api<Void>> deleteBoard(@PathVariable(value = "id") Long boardId) {
+    boardService.deleteBoard(boardId);
+    return ResponseEntity.ok(Api.success("BOARD_DELETE", "게시판 삭제"));
+  }
 }

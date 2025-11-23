@@ -22,7 +22,7 @@ public class Post extends BaseEntity {
 
   private int viewCount;
 
-  private Board board;
+  // private Board board;
 
-  private List<Comment> commentList;
+  // private List<Comment> commentList;
 }
