@@ -37,7 +37,7 @@ public class PostService {
   // 게시글 조회(단일 조회)
   public PostResponseDto readPost(Long postId) {
     Post post = findPost(postId);
-    post.viewCount();
+    post.increaseViewCount();
     PostResponseDto responseDto = PostResponseDto.of(
         post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount());
     return responseDto;
@@ -45,8 +45,8 @@ public class PostService {
 
   // 게시글 조회(사용자 글 다수 조회)
   @Transactional(readOnly = true)
-  public List<PostListResponseDto> readAllMemberPost(Long userId) {
-    List<PostListResponseDto> postResponseDtoList = postRepository.findAllByMemberId(userId).stream()
+  public List<PostListResponseDto> readAllMemberPost(Long memberId) {
+    List<PostListResponseDto> postResponseDtoList = postRepository.findAllByMemberId(memberId).stream()
         .map(post -> PostListResponseDto.of(
             post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount())).toList();
     return postResponseDtoList;
@@ -62,8 +62,11 @@ public class PostService {
   }
 
   // 게시글 수정
-  public PostResponseDto editPost(Long postId, PostRequestDto postRequestDto) {
+  public PostResponseDto editPost(Long postId, PostRequestDto postRequestDto, Long memberId) {
     Post post = findPost(postId);
+    if (!post.getMember().getId().equals(memberId)) {
+      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
+    }
     Board board = findBoard(postRequestDto.getBoardId());
     post.changeBoard(board);
     post.changeTitle(postRequestDto.getTitle());
@@ -75,8 +78,11 @@ public class PostService {
   }
 
   // 게시글 삭제
-  public void deletePost(Long postId) {
+  public void deletePost(Long postId, Long memberId) {
     Post post = findPost(postId);
+    if (!post.getMember().getId().equals(memberId)) {
+      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
+    }
     postRepository.delete(post);
   }
 

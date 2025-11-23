@@ -33,7 +33,7 @@ public class BoardController {
   }
 
   // 게시판 조회(단일 조회) -> 생각해보면 게시판의 게시글 목록이 중요하지 게시판 이름이 중요하지 않음...
-  @GetMapping("/test/{id}")
+  @GetMapping("/{id}")
   public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "id") Long boardId) {
     BoardResponseDto responseDto = boardService.readBoard(boardId);
     return ResponseEntity.ok(Api.success("BOARD_READ", "게시판 단일 조회", responseDto));

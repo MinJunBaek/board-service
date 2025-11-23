@@ -5,6 +5,7 @@ import io.github.minjunbaek.board.domain.board.repository.entity.Board;
 import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -27,12 +28,12 @@ public class Post extends BaseEntity {
 
   private int viewCount;
 
-  @ManyToOne
-  @JoinColumn(name = "member_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  @ManyToOne
-  @JoinColumn(name = "board_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "board_id", nullable = false)
   private Board board;
 
   public static Post create(String title, String content, Member member, Board board) {
@@ -56,11 +57,11 @@ public class Post extends BaseEntity {
     this.board = board;
   }
 
-  public void viewCount() {
+  public void increaseViewCount() {
     this.viewCount++;
   }
 
-  public void likeCount() {
+  public void increaseLikeCount() {
     this.likeCount++;
   }
 }

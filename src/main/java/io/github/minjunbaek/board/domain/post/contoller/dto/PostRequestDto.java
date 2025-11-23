@@ -13,6 +13,6 @@ public class PostRequestDto {
   @NotBlank
   private String title;
 
-  @NotNull
+  @NotBlank
   private String content;
 }

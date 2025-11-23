@@ -51,7 +51,7 @@ public class PostController {
     return ResponseEntity.ok(Api.success("MY_POST_LIST_VIEW", "사용자 게시글 목록 조회", postListResponseDto));
   }
 
-  @GetMapping("/{boardId}")
+  @GetMapping("/{boardId}/posts")
   public ResponseEntity<Api<List<PostListResponseDto>>> viewPosts(@PathVariable(value = "boardId") Long boardId) {
     List<PostListResponseDto> postListResponseDtos = postService.readAllPost(boardId);
     return ResponseEntity.ok(Api.success("POST_LIST_VIEW", "게시글 목록 조회", postListResponseDtos));
@@ -61,15 +61,19 @@ public class PostController {
   // 그렇다면 수정, 삭제요청에는 유저 ID를 받고 게시글의 저장된 Member.id와 인자값 으로 받은 유저 ID와 비교해서 일치하지 않으면 에러?
   @PatchMapping("/posts/{postId}")
   public ResponseEntity<Api<PostResponseDto>> editPost(
-      @PathVariable(value = "postId") Long postId,
-      @Validated @RequestBody PostRequestDto postRequestDto) {
-    PostResponseDto responseDto = postService.editPost(postId, postRequestDto);
+      @PathVariable(value = "postId") Long postId, @Validated @RequestBody PostRequestDto postRequestDto,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+    Long memberId = memberPrincipal.getId();
+    PostResponseDto responseDto = postService.editPost(postId, postRequestDto, memberId);
     return ResponseEntity.ok(Api.success("POST_EDIT", "게시글 수정", responseDto));
   }
 
   @DeleteMapping("/posts/{postId}")
-  public ResponseEntity<Api<Void>> deletePost(@PathVariable(value = "postId") Long postId) {
-    postService.deletePost(postId);
+  public ResponseEntity<Api<Void>> deletePost(
+      @PathVariable(value = "postId") Long postId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+    Long memberId = memberPrincipal.getId();
+    postService.deletePost(postId, memberId);
     return ResponseEntity.ok(Api.success("POST_DELETE", "게시글 삭제"));
   }
 }
