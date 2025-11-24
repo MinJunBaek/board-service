@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/boards")
 @RestController
 @RequiredArgsConstructor
 public class PostController {
@@ -33,28 +31,14 @@ public class PostController {
       @Validated @RequestBody PostRequestDto requestDto) {
     Long memberId = principal.getId();
     postService.createPost(memberId, requestDto);
-    return ResponseEntity.ok(Api.success("POST_CREATE", "게시글 생성"));
+    return ResponseEntity.ok(Api.success("CREATE_POST", "게시글 생성"));
   }
 
   @GetMapping("/posts/{postId}")
   public ResponseEntity<Api<PostResponseDto>> viewPost(
       @PathVariable(value = "postId") Long postId) {
     PostResponseDto postResponseDto = postService.readPost(postId);
-    return ResponseEntity.ok(Api.success("POST_VIEW", "게시글 상세 조회", postResponseDto));
-  }
-
-  @GetMapping("/my-post-list")
-  public ResponseEntity<Api<List<PostListResponseDto>>> viewMemberPosts(
-      @AuthenticationPrincipal MemberPrincipal memberPrincipal
-  ) {
-    List<PostListResponseDto> postListResponseDto = postService.readAllMemberPost(memberPrincipal.getId());
-    return ResponseEntity.ok(Api.success("MY_POST_LIST_VIEW", "사용자 게시글 목록 조회", postListResponseDto));
-  }
-
-  @GetMapping("/{boardId}/posts")
-  public ResponseEntity<Api<List<PostListResponseDto>>> viewPosts(@PathVariable(value = "boardId") Long boardId) {
-    List<PostListResponseDto> postListResponseDtos = postService.readAllPost(boardId);
-    return ResponseEntity.ok(Api.success("POST_LIST_VIEW", "게시글 목록 조회", postListResponseDtos));
+    return ResponseEntity.ok(Api.success("VIEW_POST", "게시글 상세 조회", postResponseDto));
   }
 
   // 신경 써야 하는것: 권한(자신이 쓴 글만 수정하거나 삭제할수 있게 해야한다.)
@@ -65,7 +49,7 @@ public class PostController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
     Long memberId = memberPrincipal.getId();
     PostResponseDto responseDto = postService.editPost(postId, postRequestDto, memberId);
-    return ResponseEntity.ok(Api.success("POST_EDIT", "게시글 수정", responseDto));
+    return ResponseEntity.ok(Api.success("EDIT_POST", "게시글 수정", responseDto));
   }
 
   @DeleteMapping("/posts/{postId}")
@@ -74,6 +58,20 @@ public class PostController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
     Long memberId = memberPrincipal.getId();
     postService.deletePost(postId, memberId);
-    return ResponseEntity.ok(Api.success("POST_DELETE", "게시글 삭제"));
+    return ResponseEntity.ok(Api.success("DELETE_POST", "게시글 삭제"));
+  }
+
+  @GetMapping("/boards/{boardId}/posts")
+  public ResponseEntity<Api<List<PostListResponseDto>>> viewPosts(@PathVariable(value = "boardId") Long boardId) {
+    List<PostListResponseDto> postListResponseDtos = postService.readAllPost(boardId);
+    return ResponseEntity.ok(Api.success("VIEW_POST_LIST", "게시글 목록 조회", postListResponseDtos));
+  }
+
+  @GetMapping("members/me/posts")
+  public ResponseEntity<Api<List<PostListResponseDto>>> viewMemberPosts(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal
+  ) {
+    List<PostListResponseDto> postListResponseDto = postService.readAllMemberPost(memberPrincipal.getId());
+    return ResponseEntity.ok(Api.success("VIEW_MY_POST_LIST", "사용자 게시글 목록 조회", postListResponseDto));
   }
 }

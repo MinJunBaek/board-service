@@ -4,7 +4,6 @@ import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRequestDto;
-import io.github.minjunbaek.board.domain.member.controller.dto.LoginUserSessionDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberUnregisterDto;
@@ -20,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,15 +32,15 @@ public class MemberController {
 
   private final MemberService memberService;
 
-  // 회원가입
-  @PostMapping("/register")
+  // 회원 가입
+  @PostMapping
   public ResponseEntity<Api<Void>> register(@RequestBody @Validated MemberRegisterDto memberRegisterDto) {
     String result = memberService.register(memberRegisterDto);
     return ResponseEntity.status(201).body(Api.success("MEMBER_CREATED", result));
   }
 
   // 회원 탈퇴
-  @PostMapping("/unregister")
+  @PostMapping("/me")
   public ResponseEntity<Api<Void>> unregister(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated@RequestBody MemberUnregisterDto memberUnregisterDto,
@@ -59,7 +59,7 @@ public class MemberController {
   }
 
   // 내정보 조회
-  @GetMapping("/my-information")
+  @GetMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> viewMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
     if (memberPrincipal == null) {
@@ -72,7 +72,7 @@ public class MemberController {
   }
 
   // 내정보 수정
-  @PostMapping("/my-information")
+  @PatchMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> editMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated @RequestBody EditInformationRequestDto requestDto) {
@@ -86,26 +86,6 @@ public class MemberController {
     MemberInformationDto informationDto = memberService.editMyInformation(memberId, requestDto);
 
     return ResponseEntity.ok(Api.success("MY_INFORMATION_CHANGE", "내정보 수정", informationDto));
-  }
-
-  // 현재 로그인된 유저 확인용 API
-  @GetMapping("/me")
-  public ResponseEntity<Api<LoginUserSessionDto>> getCurrentMember(
-      @AuthenticationPrincipal MemberPrincipal principal) {
-
-    if (principal == null) {
-      throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
-    }
-
-    LoginUserSessionDto dto = LoginUserSessionDto.of(
-        principal.getId(),
-        principal.getEmail(),
-        principal.getName()
-    );
-
-    Api<LoginUserSessionDto> body = Api.success("ME", "현재 로그인된 사용자입니다.", dto);
-
-    return ResponseEntity.ok(body);
   }
 
   // 아이디 및 패스워드 찾기

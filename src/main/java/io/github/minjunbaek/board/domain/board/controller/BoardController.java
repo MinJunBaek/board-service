@@ -29,21 +29,21 @@ public class BoardController {
   @PostMapping
   public ResponseEntity<Api<Void>> create(@Validated @RequestBody BoardRequestDto requestDto) {
     boardService.createBoard(requestDto);
-    return ResponseEntity.ok(Api.success("BOARD_CREATE", "게시판 생성"));
+    return ResponseEntity.ok(Api.success("CREATE_BOARD", "게시판 생성"));
   }
 
   // 게시판 조회(단일 조회) -> 생각해보면 게시판의 게시글 목록이 중요하지 게시판 이름이 중요하지 않음...
   @GetMapping("/{boardId}")
   public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "boardId") Long boardId) {
     BoardResponseDto responseDto = boardService.readBoard(boardId);
-    return ResponseEntity.ok(Api.success("BOARD_READ", "게시판 단일 조회", responseDto));
+    return ResponseEntity.ok(Api.success("VIEW_BOARD", "게시판 단일 조회", responseDto));
   }
 
   // 게시판 조회(다수 조회)
   @GetMapping
   public ResponseEntity<Api<List<BoardMultipleResponseDto>>> readAll() {
     List<BoardMultipleResponseDto> boardList = boardService.readAllBoard();
-    return ResponseEntity.ok(Api.success("BOARD_LIST", "게시판 목록 조회", boardList));
+    return ResponseEntity.ok(Api.success("VIEW_BOARD_LIST", "게시판 목록 조회", boardList));
   }
 
   // 게시판 수정
@@ -52,13 +52,13 @@ public class BoardController {
       @PathVariable(value = "boardId") Long boardId,
       @Validated @RequestBody BoardRequestDto requestDto) {
     BoardResponseDto responseDto = boardService.editBoard(boardId, requestDto);
-    return ResponseEntity.ok(Api.success("BOARD_EDIT", "게시판 수정", responseDto));
+    return ResponseEntity.ok(Api.success("EDIT_BOARD", "게시판 수정", responseDto));
   }
 
   // 게시판 삭제
   @DeleteMapping("/{boardId}")
   public ResponseEntity<Api<Void>> deleteBoard(@PathVariable(value = "boardId") Long boardId) {
     boardService.deleteBoard(boardId);
-    return ResponseEntity.ok(Api.success("BOARD_DELETE", "게시판 삭제"));
+    return ResponseEntity.ok(Api.success("DELETE_BOARD", "게시판 삭제"));
   }
 }
