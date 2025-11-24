@@ -2,7 +2,6 @@ package io.github.minjunbaek.board.domain.board.controller;
 
 import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardRequestDto;
-import io.github.minjunbaek.board.domain.board.controller.dto.BoardMultipleResponseDto;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import java.util.List;
@@ -41,8 +40,8 @@ public class BoardController {
 
   // 게시판 조회(다수 조회)
   @GetMapping
-  public ResponseEntity<Api<List<BoardMultipleResponseDto>>> readAll() {
-    List<BoardMultipleResponseDto> boardList = boardService.readAllBoard();
+  public ResponseEntity<Api<List<BoardResponseDto>>> readAll() {
+    List<BoardResponseDto> boardList = boardService.readAllBoard();
     return ResponseEntity.ok(Api.success("VIEW_BOARD_LIST", "게시판 목록 조회", boardList));
   }
 

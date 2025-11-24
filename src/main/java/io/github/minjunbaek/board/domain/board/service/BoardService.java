@@ -3,7 +3,6 @@ package io.github.minjunbaek.board.domain.board.service;
 import io.github.minjunbaek.board.common.error.BoardErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardRequestDto;
-import io.github.minjunbaek.board.domain.board.controller.dto.BoardMultipleResponseDto;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.repository.BoardRepository;
 import io.github.minjunbaek.board.domain.board.repository.entity.Board;
@@ -35,9 +34,9 @@ public class BoardService {
 
   // 게시판 조회(다수 조회)
   @Transactional(readOnly = true)
-  public List<BoardMultipleResponseDto> readAllBoard() {
-    List<BoardMultipleResponseDto> boardList = boardRepository.findAll().stream()
-        .map(board -> BoardMultipleResponseDto.of(board.getId(), board.getBoardName())).toList();
+  public List<BoardResponseDto> readAllBoard() {
+    List<BoardResponseDto> boardList = boardRepository.findAll().stream()
+        .map(board -> BoardResponseDto.of(board.getId(), board.getBoardName())).toList();
     return boardList;
   }
 
