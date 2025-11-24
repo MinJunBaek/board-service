@@ -55,7 +55,7 @@ public class BoardService {
   }
 
   // 중복되는 Board를 조회하는 로직을 따로 구현
-  private Board findBoard(Long boardId) {
+  public Board findBoard(Long boardId) {
     Board board = boardRepository.findById(boardId)
         .orElseThrow(() -> new ApiException(BoardErrorCode.BOARD_NOT_FOUND));
     return board;

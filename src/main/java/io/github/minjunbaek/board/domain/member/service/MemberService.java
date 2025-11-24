@@ -50,8 +50,7 @@ public class MemberService{
 
   @Transactional(readOnly = true)
   public MemberInformationDto getMyInformation(String email) {
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMember(email);
 
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString());
@@ -59,8 +58,7 @@ public class MemberService{
 
   @Transactional
   public MemberInformationDto editMyInformation(Long id, EditInformationRequestDto requestDto) {
-    Member member = memberRepository.findById(id)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMember(id);
 
     // 현재 비밀번호 검증
     if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
@@ -86,5 +84,17 @@ public class MemberService{
     // 결과
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString());
+  }
+
+  public Member findMember(Long memberId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    return member;
+  }
+
+  public Member findMember(String email) {
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    return member;
   }
 }

@@ -33,8 +33,8 @@ public class BoardController {
   }
 
   // 게시판 조회(단일 조회) -> 생각해보면 게시판의 게시글 목록이 중요하지 게시판 이름이 중요하지 않음...
-  @GetMapping("/{id}")
-  public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "id") Long boardId) {
+  @GetMapping("/{boardId}")
+  public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "boardId") Long boardId) {
     BoardResponseDto responseDto = boardService.readBoard(boardId);
     return ResponseEntity.ok(Api.success("BOARD_READ", "게시판 단일 조회", responseDto));
   }
@@ -47,17 +47,17 @@ public class BoardController {
   }
 
   // 게시판 수정
-  @PatchMapping("/{id}")
+  @PatchMapping("/{boardId}")
   public ResponseEntity<Api<BoardResponseDto>> editBoard(
-      @PathVariable(value = "id") Long boardId,
+      @PathVariable(value = "boardId") Long boardId,
       @Validated @RequestBody BoardRequestDto requestDto) {
     BoardResponseDto responseDto = boardService.editBoard(boardId, requestDto);
     return ResponseEntity.ok(Api.success("BOARD_EDIT", "게시판 수정", responseDto));
   }
 
   // 게시판 삭제
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Api<Void>> deleteBoard(@PathVariable(value = "id") Long boardId) {
+  @DeleteMapping("/{boardId}")
+  public ResponseEntity<Api<Void>> deleteBoard(@PathVariable(value = "boardId") Long boardId) {
     boardService.deleteBoard(boardId);
     return ResponseEntity.ok(Api.success("BOARD_DELETE", "게시판 삭제"));
   }
