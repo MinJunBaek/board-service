@@ -13,9 +13,3 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
-  security:
-    user:
-      name: user
-      password: "{noop}1234"   # 개발용, 임시 비번
-      roles: USER

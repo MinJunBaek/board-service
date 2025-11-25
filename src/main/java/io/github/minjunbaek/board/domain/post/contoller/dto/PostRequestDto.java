@@ -3,8 +3,10 @@ package io.github.minjunbaek.board.domain.post.contoller.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class PostRequestDto {
 
   @NotNull

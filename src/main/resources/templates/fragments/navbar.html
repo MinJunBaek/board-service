@@ -1,0 +1,53 @@
+<!-- templates/fragments/navbar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mx-auto"
+         th:fragment="navbar">
+      <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Home</a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- 왼쪽: 게시판 버튼들 자동 생성 -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item" th:each="board : ${boards}">
+              <a class="nav-link"
+                 th:text="${board.boardName}"
+                 th:href="@{|/boards/${board.id}/posts|}">
+                게시판
+              </a>
+            </li>
+          </ul>
+
+          <!-- 오른쪽: 로그인/로그아웃 영역 -->
+          <div class="d-flex align-items-center">
+            <!-- 로그인 상태 -->
+            <span class="navbar-text me-3" th:if="${loggedIn}">
+          <strong th:text="${memberName}">게스트</strong> 님
+        </span>
+
+            <form th:if="${loggedIn}"
+                  th:action="@{/logout}"
+                  method="post"
+                  class="mb-0">
+              <button class="btn btn-outline-danger" type="submit">로그아웃</button>
+            </form>
+
+            <!-- 비로그인 상태 -->
+            <a th:if="${!loggedIn}" class="btn btn-outline-primary"
+               th:href="@{/login}">
+              로그인
+            </a>
+            <a th:if="${!loggedIn}" class="btn btn-outline-primary" th:href="@{/join-form}"></a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </body>
+</html>

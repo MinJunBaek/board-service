@@ -2,6 +2,7 @@ package io.github.minjunbaek.board.web;
 
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
+import io.github.minjunbaek.board.domain.post.contoller.dto.PostRequestDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import java.util.List;
@@ -9,19 +10,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class PageController {
+public class PostPageController {
 
   private final BoardService boardService;
   private final PostService postService;
 
-  // 메인 페이지
-  @GetMapping("/")
-  public String mainPage(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
-
+  @GetMapping("/boards/{boardId}/posts/new")
+  public String createPost(@PathVariable(name = "boardId") Long boardId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
     // 1) 게시판 목록 조회 (API에서 쓰던 로직 그대로 활용)
     List<BoardResponseDto> boards = boardService.readAllBoard();
     model.addAttribute("boards", boards);
@@ -33,14 +36,22 @@ public class PageController {
     } else {
       model.addAttribute("loggedIn", false);
     }
-    return "index";
+
+    // 3) 내용
+    model.addAttribute("selectedBoardId", boardId);
+
+    return "post-form";
   }
 
-  // 로그인 페이지
-  @GetMapping("/login")
-  public String loginPage() {
-    return "login"; // templates/login.html
-  }
+  @PostMapping("/posts")
+  public String createPostFromForm(
+      @AuthenticationPrincipal MemberPrincipal principal,
+      @Validated PostRequestDto form // ★ @RequestBody 안 붙임 (폼 전송)
+  ) {
+    Long memberId = principal.getId();
+    postService.createPost(memberId, form);
 
-  // 로그아웃 페이지
+    // 글 작성 후 해당 게시판 목록으로 리다이렉트
+    return "redirect:/boards/" + form.getBoardId() + "/posts";
+  }
 }

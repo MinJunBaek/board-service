@@ -61,7 +61,7 @@ public class PostController {
     return ResponseEntity.ok(Api.success("DELETE_POST", "게시글 삭제"));
   }
 
-  @GetMapping("/boards/{boardId}/posts")
+  @GetMapping("/{boardId}/posts")
   public ResponseEntity<Api<List<PostListResponseDto>>> viewPosts(@PathVariable(value = "boardId") Long boardId) {
     List<PostListResponseDto> postListResponseDtos = postService.readAllPost(boardId);
     return ResponseEntity.ok(Api.success("VIEW_POST_LIST", "게시글 목록 조회", postListResponseDtos));

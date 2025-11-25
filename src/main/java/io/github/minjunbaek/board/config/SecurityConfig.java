@@ -51,8 +51,7 @@ public class SecurityConfig {
         .logout(Customizer.withDefaults())
 
         // H2 콘솔용 헤더/CSRF 예외
-        .headers(h -> h.frameOptions(frame -> frame.disable()))
-        .csrf(csrf -> csrf.disable());
+        .headers(h -> h.frameOptions(frame -> frame.disable()));
 
     return httpSecurity.build();
   }
