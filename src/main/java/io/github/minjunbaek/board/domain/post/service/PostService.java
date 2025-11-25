@@ -43,6 +43,15 @@ public class PostService {
     return responseDto;
   }
 
+  // 게시글 수정용 조회(단일 조회)
+  public PostResponseDto editReadPost(Long postId) {
+    Post post = findPost(postId);
+    PostResponseDto responseDto = PostResponseDto.of(
+        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
+        post.getMember().getName(), post.getBoard().getId());
+    return responseDto;
+  }
+
   // 게시글 조회(사용자 글 다수 조회)
   @Transactional(readOnly = true)
   public List<PostListResponseDto> readAllMemberPost(Long memberId) {

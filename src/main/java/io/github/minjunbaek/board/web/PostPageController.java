@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -24,7 +23,7 @@ public class PostPageController {
   private final BoardService boardService;
   private final PostService postService;
 
-  // 게시글 등록 이동
+  // 게시글 등록 폼으로 이동
   @GetMapping("/boards/{boardId}/posts-form")
   public String createPostForm(
       @PathVariable(name = "boardId") Long boardId,
@@ -61,7 +60,7 @@ public class PostPageController {
     return "redirect:/boards/" + form.getBoardId() + "/posts";
   }
 
-  // 수정
+  // 게시글 수정 폼으로 이동
   @GetMapping("/posts/{postId}/posts-form")
   public String editPostForm(
       @PathVariable(name = "postId") Long postId,
@@ -80,11 +79,12 @@ public class PostPageController {
     } else {
       model.addAttribute("loggedIn", false);
     }
-    PostResponseDto post = postService.readPost(postId);
+    PostResponseDto post = postService.editReadPost(postId);
     model.addAttribute("post", post);
     return "post-edit-form";
   }
 
+  // 게시글 수정
   @PostMapping("/posts/{postId}")
   public String editPost(
       @PathVariable(name = "postId") Long postId,
@@ -96,5 +96,16 @@ public class PostPageController {
     return "redirect:/boards/" + postRequestDto.getBoardId() + "/posts";
   }
 
-  // 삭제
+  // 게시글 삭제
+  @PostMapping("/boards/{boardId}/posts/{postId}")
+  public String deletePost(
+      @PathVariable(name = "boardId") Long boardId,
+      @PathVariable(name = "postId") Long postId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+
+    Long memberId = memberPrincipal.getId();
+    postService.deletePost(postId, memberId);
+
+    return "redirect:/boards/" + boardId + "/posts";
+  }
 }

@@ -70,7 +70,7 @@
                 </form>
 
                 <!-- 삭제 버튼 -->
-                <form th:action="@{|/posts/${post.id}|}" method="post"
+                <form th:action="@{|/boards/${boardId}/posts/${post.id}|}" method="post"
                       class="m-0 d-inline-block"
                       onsubmit="return confirm('정말 삭제하시겠습니까?');">
                   <input type="hidden" name="_method" value="delete"/>
