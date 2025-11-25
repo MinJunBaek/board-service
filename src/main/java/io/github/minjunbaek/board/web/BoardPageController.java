@@ -36,10 +36,12 @@ public class BoardPageController {
     model.addAttribute("posts", posts);
     model.addAttribute("boardId", boardId);
 
+
     // 로그인 여부
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
-      model.addAttribute("memberName", memberPrincipal.getName()); // 필드명에 맞게 수정
+      model.addAttribute("memberId", memberPrincipal.getId());
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName()); // 필드명에 맞게 수정
     } else {
       model.addAttribute("loggedIn", false);
     }

@@ -9,13 +9,15 @@ public class PostListResponseDto {
   private String title;
   private int likeCount;
   private int viewCount;
+  private String memberName;
 
-  public static PostListResponseDto of(Long id, String title, int likeCount, int viewCount) {
+  public static PostListResponseDto of(Long id, String title, int likeCount, int viewCount, String memberName) {
     PostListResponseDto dto = new PostListResponseDto();
     dto.id = id;
     dto.title = title;
     dto.likeCount = likeCount;
     dto.viewCount = viewCount;
+    dto.memberName = memberName;
     return dto;
   }
 }

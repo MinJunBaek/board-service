@@ -22,7 +22,8 @@ public class PostPageController {
   private final BoardService boardService;
   private final PostService postService;
 
-  @GetMapping("/boards/{boardId}/posts/new")
+  // 게시글 등록 이동
+  @GetMapping("/{boardId}/posts")
   public String createPost(@PathVariable(name = "boardId") Long boardId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
     // 1) 게시판 목록 조회 (API에서 쓰던 로직 그대로 활용)
@@ -32,7 +33,8 @@ public class PostPageController {
     // 2) 로그인 상태 정보
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
-      model.addAttribute("memberName", memberPrincipal.getName());
+      model.addAttribute("memberId", memberPrincipal.getId());
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName()); // 필드명에 맞게 수정
     } else {
       model.addAttribute("loggedIn", false);
     }
@@ -43,6 +45,7 @@ public class PostPageController {
     return "post-form";
   }
 
+  // 등록
   @PostMapping("/posts")
   public String createPostFromForm(
       @AuthenticationPrincipal MemberPrincipal principal,
@@ -54,4 +57,8 @@ public class PostPageController {
     // 글 작성 후 해당 게시판 목록으로 리다이렉트
     return "redirect:/boards/" + form.getBoardId() + "/posts";
   }
+
+  // 수정
+
+  // 삭제
 }

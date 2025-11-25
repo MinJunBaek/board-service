@@ -27,20 +27,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+// @RequestMapping("/members")
 public class MemberController {
 
   private final MemberService memberService;
 
   // 회원 가입
-  @PostMapping
+  // @PostMapping
   public ResponseEntity<Api<Void>> register(@RequestBody @Validated MemberRegisterDto memberRegisterDto) {
     String result = memberService.register(memberRegisterDto);
     return ResponseEntity.status(201).body(Api.success("MEMBER_CREATED", result));
   }
 
   // 회원 탈퇴
-  @PostMapping("/me")
+  // @PostMapping("/me")
   public ResponseEntity<Api<Void>> unregister(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated@RequestBody MemberUnregisterDto memberUnregisterDto,
@@ -59,7 +59,7 @@ public class MemberController {
   }
 
   // 내정보 조회
-  @GetMapping("/me")
+  // @GetMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> viewMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
     if (memberPrincipal == null) {
@@ -72,7 +72,7 @@ public class MemberController {
   }
 
   // 내정보 수정
-  @PatchMapping("/me")
+  // @PatchMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> editMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated @RequestBody EditInformationRequestDto requestDto) {

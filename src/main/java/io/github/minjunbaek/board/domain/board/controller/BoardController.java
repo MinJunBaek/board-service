@@ -18,35 +18,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/boards")
+// @RequestMapping("/boards")
 @RequiredArgsConstructor
 public class BoardController {
 
   private final BoardService boardService;
 
   // 게시판 생성
-  @PostMapping
+  // @PostMapping
   public ResponseEntity<Api<Void>> create(@Validated @RequestBody BoardRequestDto requestDto) {
     boardService.createBoard(requestDto);
     return ResponseEntity.ok(Api.success("CREATE_BOARD", "게시판 생성"));
   }
 
   // 게시판 조회(단일 조회) -> 생각해보면 게시판의 게시글 목록이 중요하지 게시판 이름이 중요하지 않음...
-  @GetMapping("/{boardId}")
+  // @GetMapping("/{boardId}")
   public ResponseEntity<Api<BoardResponseDto>> read(@PathVariable(value = "boardId") Long boardId) {
     BoardResponseDto responseDto = boardService.readBoard(boardId);
     return ResponseEntity.ok(Api.success("VIEW_BOARD", "게시판 단일 조회", responseDto));
   }
 
   // 게시판 조회(다수 조회)
-  @GetMapping
+  // @GetMapping
   public ResponseEntity<Api<List<BoardResponseDto>>> readAll() {
     List<BoardResponseDto> boardList = boardService.readAllBoard();
     return ResponseEntity.ok(Api.success("VIEW_BOARD_LIST", "게시판 목록 조회", boardList));
   }
 
   // 게시판 수정
-  @PatchMapping("/{boardId}")
+  // @PatchMapping("/{boardId}")
   public ResponseEntity<Api<BoardResponseDto>> editBoard(
       @PathVariable(value = "boardId") Long boardId,
       @Validated @RequestBody BoardRequestDto requestDto) {
@@ -55,7 +55,7 @@ public class BoardController {
   }
 
   // 게시판 삭제
-  @DeleteMapping("/{boardId}")
+  // @DeleteMapping("/{boardId}")
   public ResponseEntity<Api<Void>> deleteBoard(@PathVariable(value = "boardId") Long boardId) {
     boardService.deleteBoard(boardId);
     return ResponseEntity.ok(Api.success("DELETE_BOARD", "게시판 삭제"));

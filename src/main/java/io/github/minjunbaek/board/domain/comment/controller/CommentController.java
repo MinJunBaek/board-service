@@ -24,13 +24,13 @@ public class CommentController {
 
   private final CommentService commentService;
 
-  @GetMapping("/posts/{postId}/comments")
+  // @GetMapping("/posts/{postId}/comments")
   public ResponseEntity<Api<List<CommentResponseDto>>> viewAllComment(@PathVariable(name = "postId") Long postId) {
     List<CommentResponseDto> commentResponseDtoList = commentService.viewAllComment(postId);
     return ResponseEntity.ok(Api.success("VIEW_COMMENT_LIST", "댓글 조회", commentResponseDtoList));
   }
 
-  @PostMapping("/posts/{postId}/comments")
+  // @PostMapping("/posts/{postId}/comments")
   public ResponseEntity<Api<Void>> createComment(
       @PathVariable(name = "postId") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
@@ -40,7 +40,7 @@ public class CommentController {
     return ResponseEntity.ok(Api.success("CREATE_COMMENT", "댓글 생성"));
   }
 
-  @PatchMapping("/comments/{commentId}")
+  // @PatchMapping("/comments/{commentId}")
   public ResponseEntity<Api<List<CommentResponseDto>>> editComment(
       @PathVariable(name = "postId") Long postId,
       @PathVariable(name = "commentId") Long commentId,
@@ -54,7 +54,7 @@ public class CommentController {
     return ResponseEntity.ok(Api.success("EDIT_COMMENT", "댓글 수정", commentResponseDtoList));
   }
 
-  @DeleteMapping("/comments/{commentId}")
+  // @DeleteMapping("/comments/{commentId}")
   public ResponseEntity<Api<Void>> deleteComment(
       @PathVariable(name = "commentId") Long commentId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {

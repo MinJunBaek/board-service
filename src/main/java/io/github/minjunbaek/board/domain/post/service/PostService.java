@@ -38,7 +38,7 @@ public class PostService {
     Post post = findPost(postId);
     post.increaseViewCount();
     PostResponseDto responseDto = PostResponseDto.of(
-        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount());
+        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(), post.getMember().getName());
     return responseDto;
   }
 
@@ -47,7 +47,7 @@ public class PostService {
   public List<PostListResponseDto> readAllMemberPost(Long memberId) {
     List<PostListResponseDto> postResponseDtoList = postRepository.findAllByMemberId(memberId).stream()
         .map(post -> PostListResponseDto.of(
-            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount())).toList();
+            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
     return postResponseDtoList;
   }
 
@@ -60,7 +60,7 @@ public class PostService {
 
     List<PostListResponseDto> postResponseDtoList = postList.stream()
         .map(post -> PostListResponseDto.of(
-            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount())).toList();
+            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
     return postResponseDtoList;
   }
 
@@ -76,7 +76,7 @@ public class PostService {
     post.changeContent(postRequestDto.getContent());
 
     PostResponseDto postResponseDto = PostResponseDto.of(post.getId(), post.getTitle(), post.getContent(),
-        post.getLikeCount(), post.getViewCount());
+        post.getLikeCount(), post.getViewCount(), post.getMember().getName());
     return postResponseDto;
   }
 

@@ -29,7 +29,8 @@ public class PageController {
     // 2) 로그인 상태 정보
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
-      model.addAttribute("memberName", memberPrincipal.getName());
+      model.addAttribute("memberId", memberPrincipal.getId());
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName()); // 필드명에 맞게 수정
     } else {
       model.addAttribute("loggedIn", false);
     }
