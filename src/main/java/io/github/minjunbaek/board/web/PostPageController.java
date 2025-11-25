@@ -3,6 +3,7 @@ package io.github.minjunbaek.board.web;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.post.contoller.dto.PostRequestDto;
+import io.github.minjunbaek.board.domain.post.contoller.dto.PostResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -23,8 +25,9 @@ public class PostPageController {
   private final PostService postService;
 
   // 게시글 등록 이동
-  @GetMapping("/{boardId}/posts")
-  public String createPost(@PathVariable(name = "boardId") Long boardId,
+  @GetMapping("/boards/{boardId}/posts-form")
+  public String createPostForm(
+      @PathVariable(name = "boardId") Long boardId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
     // 1) 게시판 목록 조회 (API에서 쓰던 로직 그대로 활용)
     List<BoardResponseDto> boards = boardService.readAllBoard();
@@ -47,11 +50,11 @@ public class PostPageController {
 
   // 등록
   @PostMapping("/posts")
-  public String createPostFromForm(
-      @AuthenticationPrincipal MemberPrincipal principal,
+  public String createPost(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated PostRequestDto form // ★ @RequestBody 안 붙임 (폼 전송)
   ) {
-    Long memberId = principal.getId();
+    Long memberId = memberPrincipal.getId();
     postService.createPost(memberId, form);
 
     // 글 작성 후 해당 게시판 목록으로 리다이렉트
@@ -59,6 +62,39 @@ public class PostPageController {
   }
 
   // 수정
+  @GetMapping("/posts/{postId}/posts-form")
+  public String editPostForm(
+      @PathVariable(name = "postId") Long postId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      Model model) {
+
+    // 게시판 목록
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    // 로그인 정보
+    if (memberPrincipal != null) {
+      model.addAttribute("loggedIn", true);
+      model.addAttribute("memberId", memberPrincipal.getId());
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
+    } else {
+      model.addAttribute("loggedIn", false);
+    }
+    PostResponseDto post = postService.readPost(postId);
+    model.addAttribute("post", post);
+    return "post-edit-form";
+  }
+
+  @PostMapping("/posts/{postId}")
+  public String editPost(
+      @PathVariable(name = "postId") Long postId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      @Validated PostRequestDto postRequestDto
+  ) {
+    Long memberId = memberPrincipal.getId();
+    postService.editPost(postId, postRequestDto, memberId);
+    return "redirect:/boards/" + postRequestDto.getBoardId() + "/posts";
+  }
 
   // 삭제
 }

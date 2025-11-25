@@ -11,8 +11,10 @@ public class PostResponseDto {
   private int likeCount;
   private int viewCount;
   private String memberName;
+  private Long boardId;
 
-  public static PostResponseDto of(Long id, String title, String content, int likeCount, int viewCount, String memberName) {
+  public static PostResponseDto of(
+      Long id, String title, String content, int likeCount, int viewCount, String memberName, Long boardId) {
     PostResponseDto dto = new PostResponseDto();
     dto.id = id;
     dto.title = title;
@@ -20,6 +22,7 @@ public class PostResponseDto {
     dto.likeCount = likeCount;
     dto.viewCount = viewCount;
     dto.memberName = memberName;
+    dto.boardId = boardId;
     return dto;
   }
 }

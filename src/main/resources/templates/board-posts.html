@@ -23,7 +23,7 @@
 
         <!-- 글쓰기 버튼 -->
         <a class="btn btn-primary"
-           th:href="@{|/${boardId}/posts|}">
+           th:href="@{|/boards/${boardId}/posts-form|}">
           글쓰기
         </a>
       </div>
@@ -62,7 +62,7 @@
                    class="d-inline-flex gap-1 ms-2">
 
                 <!-- 수정 버튼: 삭제와 같은 형태의 button -->
-                <form th:action="@{|/posts/${post.id}/edit|}" method="get"
+                <form th:action="@{|/posts/${post.id}/posts-form|}" method="get"
                       class="m-0 d-inline-block">
                   <button type="submit" class="btn btn-outline-primary btn-sm">
                     수정

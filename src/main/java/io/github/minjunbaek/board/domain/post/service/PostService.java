@@ -38,7 +38,8 @@ public class PostService {
     Post post = findPost(postId);
     post.increaseViewCount();
     PostResponseDto responseDto = PostResponseDto.of(
-        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(), post.getMember().getName());
+        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
+        post.getMember().getName(), post.getBoard().getId());
     return responseDto;
   }
 
@@ -76,7 +77,7 @@ public class PostService {
     post.changeContent(postRequestDto.getContent());
 
     PostResponseDto postResponseDto = PostResponseDto.of(post.getId(), post.getTitle(), post.getContent(),
-        post.getLikeCount(), post.getViewCount(), post.getMember().getName());
+        post.getLikeCount(), post.getViewCount(), post.getMember().getName(), post.getBoard().getId());
     return postResponseDto;
   }
 
