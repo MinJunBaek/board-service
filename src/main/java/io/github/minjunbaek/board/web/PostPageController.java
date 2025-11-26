@@ -47,6 +47,7 @@ public class PostPageController {
 
     // 3) 내용
     model.addAttribute("selectedBoardId", boardId);
+    model.addAttribute("boardTitle", boards.get(boardId.intValue() - 1).getBoardName());
 
     return "post-form";
   }
