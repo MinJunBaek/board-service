@@ -49,7 +49,7 @@ public class CommentService {
   // 권한 필요: 댓글의 수정 삭제 기능은 해당 유저만 권한을 갖는다.
 
   // 댓글 수정 (권한 필요)
-  public List<CommentResponseDto> editComment(Long postId, Long commentId, Long memberId, CommentRequestDto commentRequestDto) {
+  public CommentResponseDto editComment(Long postId, Long commentId, Long memberId, CommentRequestDto commentRequestDto) {
     Comment comment = findComment(commentId);
 
     // 권한체크
@@ -58,7 +58,8 @@ public class CommentService {
     // 댓글 수정 및 저장
     comment.changeContent(commentRequestDto.getContent());
     commentRepository.save(comment);
-    return viewAllComment(postId);
+    return CommentResponseDto.of(comment.getId(), comment.getContent(), comment.getMember().getId(),
+        comment.getMember().getName(), comment.getUpdatedAt());
   }
 
   // 댓글 삭제 (권한 필요)

@@ -3,9 +3,122 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
-    <title>Main Page</title>
+
+    <title th:text="${post.title}">게시글 상세</title>
+
+    <!-- CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- 댓글 inline 수정 스크립트 -->
+    <script th:inline="javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        const postId = /*[[${post.id}]]*/ 0;
+
+        const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.content : null;
+        const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : null;
+
+        // 수정 버튼 → 수정 모드
+        document.querySelectorAll(".comment-edit-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const commentId = btn.dataset.commentId;
+            const root = document.querySelector(
+              `.comment-item[data-comment-id="${commentId}"]`
+            );
+            if (!root) return;
+
+            const viewArea = root.querySelector(".comment-view");
+            const editArea = root.querySelector(".comment-edit-area");
+            const textarea = root.querySelector(".comment-edit-input");
+
+            textarea.value = viewArea.innerText.trim();
+
+            viewArea.classList.add("d-none");
+            editArea.classList.remove("d-none");
+          });
+        });
+
+        // 취소 버튼 → 원래대로
+        document.querySelectorAll(".comment-cancel-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const root = btn.closest(".comment-item");
+            const viewArea = root.querySelector(".comment-view");
+            const editArea = root.querySelector(".comment-edit-area");
+
+            editArea.classList.add("d-none");
+            viewArea.classList.remove("d-none");
+          });
+        });
+
+        // 저장 버튼 → PATCH 호출
+        document.querySelectorAll(".comment-save-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const commentId = btn.dataset.commentId;
+            const root = document.querySelector(
+              `.comment-item[data-comment-id="${commentId}"]`
+            );
+            if (!root) return;
+
+            const textarea = root.querySelector(".comment-edit-input");
+            const newContent = textarea.value.trim();
+            if (!newContent) {
+              alert("내용을 입력해 주세요.");
+              return;
+            }
+
+            try {
+              const headers = {
+                "Content-Type": "application/json",
+              };
+              if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+              }
+
+              const response = await fetch(
+                `/posts/${postId}/comments/${commentId}`,
+                {
+                  method: "PATCH",
+                  headers,
+                  body: JSON.stringify({ content: newContent }),
+                }
+              );
+
+              if (!response.ok) {
+                alert("댓글 수정에 실패했습니다.");
+                return;
+              }
+
+              const api = await response.json();
+              // Api.success(code, message, data) 구조라면 이게 정석
+              const updated = api.data ?? api;
+
+              const viewArea = root.querySelector(".comment-view");
+              const contentP = viewArea.querySelector("p");
+              contentP.innerHTML = newContent.replace(/\n/g, "<br/>");
+
+              const dateSpan = root.querySelector(".comment-date");
+              if (updated && updated.updatedAt) {
+                const formatted = updated.updatedAt
+                  .substring(0, 16)
+                  .replace("T", " ");
+                dateSpan.innerText = formatted;
+              }
+
+              root.querySelector(".comment-edit-area").classList.add("d-none");
+              viewArea.classList.remove("d-none");
+            } catch (e) {
+              console.error(e);
+              alert("댓글 수정 중 오류가 발생했습니다.");
+            }
+          });
+        });
+      });
+    </script>
   </head>
 
   <body>
@@ -44,14 +157,14 @@
 
         <!-- 작성자만: 수정/삭제 버튼 -->
         <div th:if="${isPostAuthor}">
-          <a th:href="@{|/posts/${post.id}/edit-form|}" class="btn btn-secondary me-2">
+          <a th:href="@{|/posts/${post.id}/posts-edit-form|}" class="btn btn-secondary me-2">
             수정
           </a>
 
-          <form th:action="@{|/posts/${post.id}|}" method="post" class="d-inline">
+          <form th:action="@{|/boards/${post.boardId}/posts/${post.id}|}" method="post" class="d-inline">
             <!-- HiddenHttpMethodFilter 사용 시 -->
             <input type="hidden" name="_method" value="delete" />
-            <button type="submit" class="btn btn-danger">
+            <button type="submit" class="btn btn-outline-danger">
               삭제
             </button>
           </form>
@@ -92,27 +205,30 @@
           <p class="text-muted">등록된 댓글이 없습니다.</p>
         </div>
 
-        <div th:each="comment : ${comments}" class="border-bottom py-3">
+        <div th:each="comment : ${comments}"
+             class="border-bottom py-3 comment-item"
+             th:attr="data-comment-id=${comment.id}">
           <div class="d-flex justify-content-between">
             <div>
               <strong th:text="${comment.memberName}">작성자</strong>
-              <span class="text-muted small"
+              <span class="text-muted small comment-date"
                     th:text="${#temporals.format(comment.updatedAt, 'yyyy-MM-dd HH:mm')}">
-              날짜
-            </span>
+          날짜
+        </span>
             </div>
 
             <!-- 댓글 작성자만 수정/삭제 -->
             <div th:if="${loggedIn != null and memberId == comment.memberId}">
-              <!-- 댓글 수정 페이지로 이동 or JS로 토글해서 inline 수정도 가능 -->
-              <a th:href="@{|/posts/${post.id}/comments/${comment.id}/edit-form|}"
-                 class="btn btn-sm btn-outline-secondary me-1">
+              <!-- 수정: JS로 inline 수정 -->
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary me-1 comment-edit-btn"
+                      th:attr="data-comment-id=${comment.id}">
                 수정
-              </a>
+              </button>
 
+              <!-- 삭제 (페이지 방식 그대로 사용) -->
               <form th:action="@{|/posts/${post.id}/comments/${comment.id}|}"
                     method="post" class="d-inline">
-                <input type="hidden" name="_method" value="delete" />
                 <button type="submit" class="btn btn-sm btn-outline-danger">
                   삭제
                 </button>
@@ -121,7 +237,27 @@
           </div>
 
           <div class="mt-2">
-            <p th:utext="${#strings.replace(comment.content, '\n', '<br/>')}"></p>
+            <!-- 보기 모드 -->
+            <div class="comment-view">
+              <p th:utext="${#strings.replace(comment.content, '\n', '<br/>')}"></p>
+            </div>
+
+            <!-- 수정 모드 (처음에는 숨김) -->
+            <div class="comment-edit-area d-none">
+        <textarea class="form-control comment-edit-input" rows="3"
+                  th:text="${comment.content}"></textarea>
+              <div class="mt-2">
+                <button type="button"
+                        class="btn btn-sm btn-primary comment-save-btn"
+                        th:attr="data-comment-id=${comment.id}">
+                  저장
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-secondary comment-cancel-btn">
+                  취소
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -40,18 +40,17 @@ public class CommentController {
     return ResponseEntity.ok(Api.success("CREATE_COMMENT", "댓글 생성"));
   }
 
-  // @PatchMapping("/comments/{commentId}")
-  public ResponseEntity<Api<List<CommentResponseDto>>> editComment(
+  @PatchMapping("/posts/{postId}/comments/{commentId}")
+  public ResponseEntity<Api<CommentResponseDto>> editComment(
       @PathVariable(name = "postId") Long postId,
       @PathVariable(name = "commentId") Long commentId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated @RequestBody CommentRequestDto commentRequestDto
   ) {
     Long memberId = memberPrincipal.getId();
-    List<CommentResponseDto> commentResponseDtoList = commentService.editComment(
-        postId, commentId, memberId, commentRequestDto
-    );
-    return ResponseEntity.ok(Api.success("EDIT_COMMENT", "댓글 수정", commentResponseDtoList));
+    CommentResponseDto commentResponseDto = commentService.editComment(postId, commentId, memberId,
+        commentRequestDto);
+    return ResponseEntity.ok(Api.success("EDIT_COMMENT", "댓글 수정", commentResponseDto));
   }
 
   // @DeleteMapping("/comments/{commentId}")
