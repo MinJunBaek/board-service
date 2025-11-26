@@ -36,12 +36,4 @@ public class PageController {
     }
     return "index";
   }
-
-  // 로그인 페이지
-  @GetMapping("/login")
-  public String loginPage() {
-    return "login"; // templates/login.html
-  }
-
-  // 로그아웃 페이지
 }

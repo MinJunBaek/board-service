@@ -40,7 +40,7 @@ public class SecurityConfig {
             // H2 콘솔
             .requestMatchers("/h2-console/**").permitAll()
             // 익명 허용(메인페이지, 회원가입)
-            .requestMatchers("/", "/members/join-form", "/members/register").permitAll()
+            .requestMatchers("/", "/members/join-form", "/members/join").permitAll()
             // 그 외는 인증
             .anyRequest().authenticated()
         )
