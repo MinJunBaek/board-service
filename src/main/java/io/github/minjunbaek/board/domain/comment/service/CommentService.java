@@ -31,7 +31,8 @@ public class CommentService {
     List<CommentResponseDto> commentResponseDtoList = commentList.stream().map(comment -> CommentResponseDto.of(
         comment.getId(),
         comment.getContent(),
-        comment.getMember().getEmail(),
+        comment.getMember().getId(),
+        comment.getMember().getName(),
         comment.getUpdatedAt()
         )).toList();
     return commentResponseDtoList;

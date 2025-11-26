@@ -2,6 +2,8 @@ package io.github.minjunbaek.board.web;
 
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
+import io.github.minjunbaek.board.domain.comment.controller.dto.CommentResponseDto;
+import io.github.minjunbaek.board.domain.comment.service.CommentService;
 import io.github.minjunbaek.board.domain.post.contoller.dto.PostRequestDto;
 import io.github.minjunbaek.board.domain.post.contoller.dto.PostResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
@@ -22,6 +24,7 @@ public class PostPageController {
 
   private final BoardService boardService;
   private final PostService postService;
+  private final CommentService commentService;
 
   // 게시글 등록 폼으로 이동
   @GetMapping("/boards/{boardId}/posts-form")
@@ -61,7 +64,7 @@ public class PostPageController {
   }
 
   // 게시글 수정 폼으로 이동
-  @GetMapping("/posts/{postId}/posts-form")
+  @GetMapping("/posts/{postId}/posts-edit-form")
   public String editPostForm(
       @PathVariable(name = "postId") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
@@ -107,5 +110,40 @@ public class PostPageController {
     postService.deletePost(postId, memberId);
 
     return "redirect:/boards/" + boardId + "/posts";
+  }
+
+  // 게시글 조회 폼으로 이동
+  @GetMapping("/posts/{postId}/posts-form")
+  public String viewPost(
+      @PathVariable(name = "postId") Long postId,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      Model model
+  ) {
+
+    if (memberPrincipal != null) {
+      model.addAttribute("loggedIn", true);
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName()); // 필드명에 맞게 수정
+    } else {
+      model.addAttribute("loggedIn", false);
+    }
+
+    // 게시판 목록
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    PostResponseDto post = postService.readPost(postId);
+
+    List<CommentResponseDto> comments = commentService.viewAllComment(postId);
+
+    Long memberId = memberPrincipal != null ? memberPrincipal.getId() : null;
+
+    boolean isPostAuthor = memberId != null && memberId.equals(post.getMemberId());
+
+    model.addAttribute("post", post);
+    model.addAttribute("comments", comments);
+    model.addAttribute("memberId", memberId);
+    model.addAttribute("isPostAuthor", isPostAuthor);
+
+    return "post";
   }
 }

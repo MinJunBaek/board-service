@@ -6,19 +6,22 @@ import lombok.Getter;
 @Getter
 public class CommentResponseDto {
 
-  private Long commentId;
+  private Long id;
 
   private String content;
 
-  private String email; // 유저의 정보는 id와 닉네임(실제로 보여지는 데이터)로 고려해보자
+  private Long memberId;
+
+  private String memberName;
 
   private LocalDateTime updatedAt;
 
-  public static CommentResponseDto of(Long commentId, String content, String email, LocalDateTime updatedAt) {
+  public static CommentResponseDto of(Long id, String content, Long memberId, String memberName, LocalDateTime updatedAt) {
     CommentResponseDto commentResponseDto = new CommentResponseDto();
-    commentResponseDto.commentId = commentId;
+    commentResponseDto.id = id;
     commentResponseDto.content = content;
-    commentResponseDto.email = email;
+    commentResponseDto.memberId = memberId;
+    commentResponseDto.memberName = memberName;
     commentResponseDto.updatedAt = updatedAt;
     return commentResponseDto;
   }

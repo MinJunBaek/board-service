@@ -39,7 +39,7 @@ public class PostService {
     post.increaseViewCount();
     PostResponseDto responseDto = PostResponseDto.of(
         post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
-        post.getMember().getName(), post.getBoard().getId());
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
     return responseDto;
   }
 
@@ -48,7 +48,7 @@ public class PostService {
     Post post = findPost(postId);
     PostResponseDto responseDto = PostResponseDto.of(
         post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
-        post.getMember().getName(), post.getBoard().getId());
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
     return responseDto;
   }
 
@@ -85,8 +85,9 @@ public class PostService {
     post.changeTitle(postRequestDto.getTitle());
     post.changeContent(postRequestDto.getContent());
 
-    PostResponseDto postResponseDto = PostResponseDto.of(post.getId(), post.getTitle(), post.getContent(),
-        post.getLikeCount(), post.getViewCount(), post.getMember().getName(), post.getBoard().getId());
+    PostResponseDto postResponseDto = PostResponseDto.of(
+        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
     return postResponseDto;
   }
 
