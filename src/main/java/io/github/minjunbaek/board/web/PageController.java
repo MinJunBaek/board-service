@@ -2,6 +2,7 @@ package io.github.minjunbaek.board.web;
 
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
+import io.github.minjunbaek.board.domain.post.contoller.dto.PostListResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import java.util.List;
@@ -34,6 +35,9 @@ public class PageController {
     } else {
       model.addAttribute("loggedIn", false);
     }
+
+    List<PostListResponseDto> posts = postService.readAllPost();
+    model.addAttribute("posts", posts);
     return "index";
   }
 }

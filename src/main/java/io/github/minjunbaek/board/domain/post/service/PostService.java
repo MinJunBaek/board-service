@@ -61,6 +61,12 @@ public class PostService {
     return postResponseDtoList;
   }
 
+  @Transactional(readOnly = true)
+  public List<PostListResponseDto> readAllPost() {
+    return postRepository.findAll().stream().map(post -> PostListResponseDto.of(post.getId(), post.getTitle(),
+        post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
+  }
+
   // 게시글 조회(게시판 글 다수 조회)
   @Transactional(readOnly = true)
   public List<PostListResponseDto> readAllPost(Long boardId) {
