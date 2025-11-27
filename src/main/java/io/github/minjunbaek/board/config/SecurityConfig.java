@@ -4,6 +4,7 @@ import io.github.minjunbaek.board.security.MemberUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,6 +42,7 @@ public class SecurityConfig {
             .requestMatchers("/h2-console/**").permitAll()
             // 익명 허용(메인페이지, 회원가입)
             .requestMatchers("/", "/members/join-form", "/members/join").permitAll()
+            .requestMatchers(HttpMethod.GET, "/boards/*/posts").permitAll()
             // 그 외는 인증
             .anyRequest().authenticated()
         )
