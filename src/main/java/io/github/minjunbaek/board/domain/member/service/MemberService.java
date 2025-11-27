@@ -53,7 +53,7 @@ public class MemberService{
     Member member = findMember(email);
 
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
-        member.getMemberRole().toString());
+        member.getMemberRole().toString().substring(5));
   }
 
   @Transactional
@@ -83,7 +83,7 @@ public class MemberService{
 
     // 결과
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
-        member.getMemberRole().toString());
+        member.getMemberRole().toString().substring(5));
   }
 
   public Member findMember(Long memberId) {

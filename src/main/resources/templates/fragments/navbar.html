@@ -2,13 +2,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary mx-auto"
-         th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mx-auto" th:fragment="navbar">
       <div class="container">
         <a class="navbar-brand" th:href="@{/}">Home</a>
 
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -28,10 +26,11 @@
           <!-- 오른쪽: 로그인/로그아웃 영역 -->
           <div class="d-flex align-items-center">
             <!-- 로그인 상태 -->
-            <span class="navbar-text me-3" th:if="${loggedIn}">
-          <strong th:text="${memberPrincipalName}">게스트</strong> 님
-        </span>
-
+            <a th:href="@{/members/me}" style="text-decoration:none;">
+              <span class="navbar-text me-3" th:if="${loggedIn}">
+                <strong th:text="${memberPrincipalName}">게스트</strong> 님
+              </span>
+            </a>
             <form th:if="${loggedIn}"
                   th:action="@{/logout}"
                   method="post"

@@ -5,9 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.StringUtils;
 
 @Getter
+@Setter
 public class EditInformationRequestDto {
 
   @Size(min = 4, message = "4자 이상입력해야 합니다.")
@@ -28,7 +30,7 @@ public class EditInformationRequestDto {
 
   // 새 비밀번호와 새 비밀번호 확인이 일치하는지 확인
   @AssertTrue(message = "새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.")
-  private boolean isPasswordConfirmMatched() {
+  public boolean isPasswordConfirmMatched() {
     boolean hasChangePassword = StringUtils.hasText(changePassword);
     boolean hasConfirmChangePassword = StringUtils.hasText(confirmPasswordChange);
 
@@ -40,7 +42,7 @@ public class EditInformationRequestDto {
   }
 
   @AssertTrue(message = "새 비밀번호는 현재 비밀번호와 달라야 합니다.")
-  private boolean isNewPasswordDifferentFromCurrent() {
+  public boolean isNewPasswordDifferentFromCurrent() {
     if (!StringUtils.hasText(changePassword)){
       return true;
     }
