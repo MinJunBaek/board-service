@@ -6,6 +6,7 @@ import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRequestDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberLoginRequestDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.domain.member.service.MemberService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,12 +32,36 @@ public class MemberPageController {
   private final BoardService boardService;
 
   // 로그인 페이지
-  @GetMapping("/login")
-  public String loginPage() {
+  @GetMapping("/login-form")
+  public String loginPage(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      @RequestParam(value = "error", required = false) String error,
+      Model model
+  ) {
+    // 1) 게시판 목록 (네가 쓰는 패턴 그대로)
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    // 2) 로그인 상태
+    if (memberPrincipal != null) {
+      model.addAttribute("loggedIn", true);
+      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
+    } else {
+      model.addAttribute("loggedIn", false);
+    }
+
+    // 3) 로그인 폼 객체
+    if (!model.containsAttribute("loginForm")) {
+      model.addAttribute("loginForm", new MemberLoginRequestDto());
+    }
+
+    // 4) 로그인 실패 시 에러 플래그(스프링 시큐리티에서 ?error 붙여줄 예정)
+    if (error != null) {
+      model.addAttribute("loginError", true);
+    }
+
     return "login-form"; // templates/login-form.html
   }
-
-  // 로그아웃 페이지
 
   // 회원 가입 페이지로 이동
   @GetMapping("/join-form")

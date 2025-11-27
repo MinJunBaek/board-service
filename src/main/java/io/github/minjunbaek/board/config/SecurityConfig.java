@@ -48,9 +48,23 @@ public class SecurityConfig {
         )
         .userDetailsService(memberUserDetailsService)
 
-        // 기본 로그인/로그아웃 폼 사용
-        .formLogin(Customizer.withDefaults())
-        .logout(Customizer.withDefaults())
+        // 커스텀 로그인 폼 사용
+        .formLogin(form -> form
+            .loginPage("/members/login-form")     // 로그인 페이지 URL (GET)
+            .loginProcessingUrl("/members/login") // 로그인 처리 URL (POST) - 컨트롤러 X
+            .usernameParameter("email")           // 폼의 name="email"
+            .passwordParameter("password")        // 폼의 name="password"
+            .defaultSuccessUrl("/", true)         // 로그인 성공 후 이동
+            .failureUrl("/members/login-form?error") // 실패 시 다시 로그인 페이지 + ?error
+            .permitAll()
+        )
+        // 기본 로그아웃 폼 사용
+        .logout(logout -> logout
+            .logoutUrl("/logout")           // 로그아웃 요청 URL (POST로 쓰는 게 기본)
+            .logoutSuccessUrl("/")          // 로그아웃 성공 후 이동
+            .invalidateHttpSession(true)
+            .deleteCookies("JSESSIONID")
+        )
 
         // H2 콘솔용 헤더/CSRF 예외
         .headers(h -> h.frameOptions(frame -> frame.disable()));
