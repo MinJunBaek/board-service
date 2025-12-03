@@ -9,6 +9,8 @@ import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformation
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberLoginRequestDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.domain.member.service.MemberService;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
+import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class MemberPageController {
 
   private final MemberService memberService;
   private final BoardService boardService;
+  private final PostService postService;
 
   // 로그인 페이지로 이동
   @GetMapping("/login-form")
@@ -158,5 +161,22 @@ public class MemberPageController {
       return "members/my-information-form";
     }
     return "members/my-information-form";
+  }
+
+  @GetMapping("/me/posts")
+  public String viewMyPostList(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
+
+    // 네비게이션용 - 게시판 목록 조회
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    model.addAttribute("loggedIn", true);
+    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
+
+    Long memberId = memberPrincipal.getId();
+    List<PostListResponseDto> posts = postService.readAllMemberPost(memberId);
+    model.addAttribute("posts", posts);
+
+    return "members/my-posts-form";
   }
 }
