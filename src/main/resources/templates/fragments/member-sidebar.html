@@ -1,0 +1,36 @@
+<!-- fragments/member-sidebar.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <!-- 마이페이지 사이드바 fragment -->
+    <!-- activeMenu 파라미터로 어떤 메뉴가 활성화될지 제어 -->
+    <div th:fragment="memberSidebar(activeMenu)">
+      <div class="list-group">
+        <!-- 내 정보 조회 -->
+        <a
+            th:href="@{/members/me}"
+            th:class="'list-group-item list-group-item-action ' + (${activeMenu} == 'INFO' ? 'active' : '')"
+            aria-current="true"
+        >
+          내 정보 조회
+        </a>
+
+        <!-- 내가 쓴 글 -->
+        <a
+            th:href="@{/members/me/posts}"
+        th:class="'list-group-item list-group-item-action ' + (${activeMenu} == 'POSTS' ? 'active' : '')"
+        >
+        내가 쓴 글
+        </a>
+
+        <!-- 회원 탈퇴 -->
+        <a
+            th:href="@{/members/me/withdraw}"
+        th:class="'list-group-item list-group-item-action text-danger ' + (${activeMenu} == 'WITHDRAW' ? 'active' : '')"
+        >
+        회원 탈퇴
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
