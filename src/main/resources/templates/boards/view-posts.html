@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
-    <title th:text="${boardName}">게시판</title>
+    <title th:text="${board.boardName}">게시판</title>
   </head>
   <body>
     <!-- ===== 네비게이션 바 ===== -->
@@ -15,13 +15,13 @@
     <div class="container mt-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h2 th:text="${boardName}">게시글 목록</h2>
+          <h2 th:text="${board.boardName}">게시글 목록</h2>
           <p class="text-muted mb-0">이 게시판에 등록된 게시글입니다.</p>
         </div>
 
         <!-- 글쓰기 버튼 -->
         <a class="btn btn-primary"
-           th:href="@{|/boards/${boardId}/posts-form|}">
+           th:href="@{|/boards/${board.id}/posts-form|}">
           글쓰기
         </a>
       </div>
@@ -37,14 +37,15 @@
         <tr>
           <th style="width: 80px;">번호</th>
           <th>제목</th>
+          <th style="width: 100px;">작성자</th>
           <th style="width: 100px;">좋아요</th>
           <th style="width: 100px;">조회수</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="post, stat : ${posts}">
+        <tr th:each="post : ${posts}">
           <!-- 번호 -->
-          <td th:text="${stat.count}">1</td>
+          <td th:text="${post.id}">0</td>
 
           <!-- 제목 + (오른쪽에) 수정/삭제 버튼 -->
           <td>
@@ -68,7 +69,7 @@
                 </form>
 
                 <!-- 삭제 버튼 -->
-                <form th:action="@{|/boards/${boardId}/posts/${post.id}|}" method="post"
+                <form th:action="@{|/boards/${board.id}/posts/${post.id}|}" method="post"
                       class="m-0 d-inline-block"
                       onsubmit="return confirm('정말 삭제하시겠습니까?');">
                   <input type="hidden" name="_method" value="delete"/>
@@ -77,6 +78,11 @@
                   </button>
                 </form>
               </div>
+            </div>
+          </td>
+          <td>
+            <div th:text=${post.memberName}>
+              작성자
             </div>
           </td>
 

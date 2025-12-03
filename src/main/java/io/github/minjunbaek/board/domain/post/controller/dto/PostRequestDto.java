@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.domain.post.contoller.dto;
+package io.github.minjunbaek.board.domain.post.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,10 +1,10 @@
-package io.github.minjunbaek.board.domain.post.contoller.dto;
+package io.github.minjunbaek.board.domain.post.controller.dto;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class PostResponseDto {
+public class PostResponseDto { // 이러한 DTO는 결국 도메인에 의존하기 때문에 Post를 의존하는것도 나쁘지 않은 선택일수 있음.
 
   private Long id;
   private String title;

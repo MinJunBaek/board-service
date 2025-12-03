@@ -6,9 +6,9 @@ import io.github.minjunbaek.board.domain.board.repository.entity.Board;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import io.github.minjunbaek.board.domain.member.service.MemberService;
-import io.github.minjunbaek.board.domain.post.contoller.dto.PostListResponseDto;
-import io.github.minjunbaek.board.domain.post.contoller.dto.PostRequestDto;
-import io.github.minjunbaek.board.domain.post.contoller.dto.PostResponseDto;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostRequestDto;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostResponseDto;
 import io.github.minjunbaek.board.domain.post.repository.PostRepository;
 import io.github.minjunbaek.board.domain.post.repository.entity.Post;
 import java.util.List;
@@ -26,66 +26,72 @@ public class PostService {
   private final PostRepository postRepository;
 
   // 게시글 생성
-  public void createPost(Long memberId, PostRequestDto requestDto) {
+  public Long createPost(Long memberId, PostRequestDto requestDto) {
     Member member = memberService.findMember(memberId);
     Board board = boardService.findBoard(requestDto.getBoardId());
     Post post = Post.create(requestDto.getTitle(), requestDto.getContent(), member, board);
     postRepository.save(post);
+    return post.getId();
   }
 
   // 게시글 조회(단일 조회)
   public PostResponseDto readPost(Long postId) {
     Post post = findPost(postId);
-    post.increaseViewCount();
+    post.increaseViewCount(); // 조회수(1) 증가
     PostResponseDto responseDto = PostResponseDto.of(
         post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
-        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getCreatedAt());
     return responseDto;
   }
 
-  // 게시글 수정용 조회(단일 조회)
-  public PostResponseDto editReadPost(Long postId) {
-    Post post = findPost(postId);
-    PostResponseDto responseDto = PostResponseDto.of(
-        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
-        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
-    return responseDto;
-  }
-
-  // 게시글 조회(사용자 글 다수 조회)
+  // 특정 사용자의 게시글 다수 조회
   @Transactional(readOnly = true)
   public List<PostListResponseDto> readAllMemberPost(Long memberId) {
-    List<PostListResponseDto> postResponseDtoList = postRepository.findAllByMemberId(memberId).stream()
+    List<PostListResponseDto> postResponseDtoList = postRepository.findAllWithMemberByMemberId(memberId).stream()
         .map(post -> PostListResponseDto.of(
-            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
+            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getId(),
+            post.getMember().getName())).toList();
     return postResponseDtoList;
   }
 
-  @Transactional(readOnly = true)
-  public List<PostListResponseDto> readAllPost() {
-    return postRepository.findAll().stream().map(post -> PostListResponseDto.of(post.getId(), post.getTitle(),
-        post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
-  }
-
-  // 게시글 조회(게시판 글 다수 조회)
+  // 특정 게시판의 게시글 다수 조회
   @Transactional(readOnly = true)
   public List<PostListResponseDto> readAllPost(Long boardId) {
     boardService.findBoard(boardId);
 
-    List<Post> postList = postRepository.findAllByBoardId(boardId);
+    List<Post> postList = postRepository.findAllWithMemberByBoardId(boardId);
 
     List<PostListResponseDto> postResponseDtoList = postList.stream()
         .map(post -> PostListResponseDto.of(
-            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getName())).toList();
+            post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getId(),
+            post.getMember().getName())).toList();
     return postResponseDtoList;
+  }
+
+  // 전체 게시글 다수 조회
+  @Transactional(readOnly = true)
+  public List<PostListResponseDto> readAllPost() {
+    return postRepository.findAllWithMember().stream().map(post -> PostListResponseDto.of(post.getId(), post.getTitle(),
+        post.getLikeCount(), post.getViewCount(), post.getMember().getId(), post.getMember().getName())).toList();
+  }
+
+  // 게시글 수정용 조회(단일 조회)
+  @Transactional(readOnly = true)
+  public PostResponseDto editReadPost(Long postId) {
+    Post post = findPost(postId);
+    PostResponseDto responseDto = PostResponseDto.of(
+        post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getCreatedAt());
+    return responseDto;
   }
 
   // 게시글 수정
   public PostResponseDto editPost(Long postId, PostRequestDto postRequestDto, Long memberId) {
+
     Post post = findPost(postId);
-    if (!post.getMember().getId().equals(memberId)) {
-      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
-    }
+
+    postPermissionCheck(post.getMember().getId(), memberId);
+
     Board board = boardService.findBoard(postRequestDto.getBoardId());
     post.changeBoard(board);
     post.changeTitle(postRequestDto.getTitle());
@@ -93,22 +99,28 @@ public class PostService {
 
     PostResponseDto postResponseDto = PostResponseDto.of(
         post.getId(), post.getTitle(), post.getContent(), post.getLikeCount(), post.getViewCount(),
-        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getUpdatedAt());
+        post.getMember().getId(), post.getMember().getName(), post.getBoard().getId(), post.getCreatedAt());
     return postResponseDto;
   }
 
   // 게시글 삭제
   public void deletePost(Long postId, Long memberId) {
     Post post = findPost(postId);
-    if (!post.getMember().getId().equals(memberId)) {
-      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
-    }
+    postPermissionCheck(post.getMember().getId(), memberId);
     postRepository.delete(post);
   }
 
+  // 해당 게시글 찾기
   public Post findPost(Long postId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new ApiException(BoardErrorCode.POST_NOT_FOUND));
     return post;
+  }
+
+  // 수정 권한 확인
+  private void postPermissionCheck(Long postMemberId, Long memberId){
+    if (!postMemberId.equals(memberId)) {
+      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
+    }
   }
 }

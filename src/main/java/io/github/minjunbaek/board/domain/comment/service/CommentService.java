@@ -27,7 +27,7 @@ public class CommentService {
   // 댓글 조회 (다수)
   @Transactional(readOnly = true)
   public List<CommentResponseDto> viewAllComment(Long postId) {
-    List<Comment> commentList = commentRepository.findAllByPostId(postId);
+    List<Comment> commentList = commentRepository.findAllWithMemberByPostId(postId);
     List<CommentResponseDto> commentResponseDtoList = commentList.stream().map(comment -> CommentResponseDto.of(
         comment.getId(),
         comment.getContent(),
@@ -49,15 +49,15 @@ public class CommentService {
   // 권한 필요: 댓글의 수정 삭제 기능은 해당 유저만 권한을 갖는다.
 
   // 댓글 수정 (권한 필요)
-  public CommentResponseDto editComment(Long postId, Long commentId, Long memberId, CommentRequestDto commentRequestDto) {
+  public CommentResponseDto editComment(Long commentId, Long memberId, CommentRequestDto commentRequestDto) {
     Comment comment = findComment(commentId);
 
     // 권한체크
     permissionCheck(comment, memberId);
 
-    // 댓글 수정 및 저장
+    // 댓글 수정
     comment.changeContent(commentRequestDto.getContent());
-    commentRepository.save(comment);
+
     return CommentResponseDto.of(comment.getId(), comment.getContent(), comment.getMember().getId(),
         comment.getMember().getName(), comment.getUpdatedAt());
   }

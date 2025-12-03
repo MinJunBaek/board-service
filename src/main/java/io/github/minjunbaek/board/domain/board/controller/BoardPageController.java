@@ -1,8 +1,8 @@
-package io.github.minjunbaek.board.web;
+package io.github.minjunbaek.board.domain.board.controller;
 
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
-import io.github.minjunbaek.board.domain.post.contoller.dto.PostListResponseDto;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import java.util.List;
@@ -26,18 +26,11 @@ public class BoardPageController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model) {
 
-    // 네비게이션용 전체 게시판 목록 (boardName 사용)
+    // 네비게이션용 - 게시판 목록 조회
     List<BoardResponseDto> boards = boardService.readAllBoard();
     model.addAttribute("boards", boards);
 
-    // 이 게시판의 게시글 목록 (API에서 쓰던 서비스 메서드를 그대로 사용)
-    List<PostListResponseDto> posts = postService.readAllPost(boardId);
-    model.addAttribute("boardName", boards.get(boardId.intValue()-1).getBoardName());
-    model.addAttribute("posts", posts);
-    model.addAttribute("boardId", boardId);
-
-
-    // 로그인 여부
+    // 네비게이션용 - 로그인 상태 정보 ==> Dto로 만들어서 model에 객체를 뿌리는게 좋을까?
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
       model.addAttribute("memberId", memberPrincipal.getId());
@@ -46,6 +39,14 @@ public class BoardPageController {
       model.addAttribute("loggedIn", false);
     }
 
-    return "board-posts"; // src/main/resources/templates/board-posts.html
+    // 해당 게시판의 정보
+    BoardResponseDto board = boardService.readBoard(boardId);
+    model.addAttribute("board", board);
+
+    // 해당 게시판의 게시글 목록
+    List<PostListResponseDto> posts = postService.readAllPost(boardId);
+    model.addAttribute("posts", posts);
+
+    return "boards/view-posts";
   }
 }

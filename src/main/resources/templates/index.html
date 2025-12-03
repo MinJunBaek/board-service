@@ -9,20 +9,26 @@
   </head>
 
   <body>
+    <!-- ===== 네비게이션 ===== -->
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
     <!-- ===== 본문: 게시글 목록 ===== -->
-    <div class="container mt-4">
+    <div class="container mt-4"> <!-- 컨테이너 -->
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h2>전체 게시판</h2>
+          <h2>전체 게시글</h2>
         </div>
 
         <!-- 글쓰기 버튼 -->
         <a class="btn btn-primary"
-           th:href="@{|/boards/${boardId}/posts-form|}">
+           th:href="@{|/posts-form|}">
           글쓰기
         </a>
+      </div>
+
+      <!-- 게시글이 없는 경우 -->
+      <div class="alert alert-info" th:if="${#lists.isEmpty(posts)}">
+        아직 작성된 게시글이 없습니다. 첫 글의 주인공이 되어보세요!
       </div>
 
       <!-- 게시글 목록 테이블 -->
@@ -31,14 +37,16 @@
         <tr>
           <th style="width: 80px;">번호</th>
           <th>제목</th>
+          <th style="width: 100px;">작성자</th>
           <th style="width: 100px;">좋아요</th>
           <th style="width: 100px;">조회수</th>
         </tr>
         </thead>
+
         <tbody>
-        <tr th:each="post, stat : ${posts}">
+        <tr th:each="post : ${posts}">
           <!-- 번호 -->
-          <td th:text="${stat.count}">1</td>
+          <td th:text="${post.id}">1</td>
 
           <!-- 제목 + (오른쪽에) 수정/삭제 버튼 -->
           <td>
@@ -73,6 +81,11 @@
               </div>
             </div>
           </td>
+          <td>
+            <div th:text=${post.memberName}>
+              작성자
+            </div>
+          </td>
 
           <!-- 좋아요 / 조회수 -->
           <td th:text="${post.likeCount}">0</td>
@@ -81,6 +94,7 @@
         </tbody>
       </table>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"

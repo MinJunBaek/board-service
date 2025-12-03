@@ -1,11 +1,9 @@
-package io.github.minjunbaek.board.web;
+package io.github.minjunbaek.board.domain.comment.controller;
 
-import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.domain.comment.controller.dto.CommentRequestDto;
 import io.github.minjunbaek.board.domain.comment.service.CommentService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class CommentPageController {
 
   private final CommentService commentService;
+  /**
+   * 댓글 등록 및 삭제시 리다이렉트로 인해 조회수가 1씩 증가가 됨.
+   * 따로 리다이렉트 URL을 만들어야 할까?
+  */
 
+  // 댓글 등록
   @PostMapping("/posts/{postId}/comments")
   public String createComment(
       @PathVariable(name = "postId") Long postId,
@@ -28,6 +31,7 @@ public class CommentPageController {
     return "redirect:/posts/" + postId + "/posts-form";
   }
 
+  // 댓글 삭제
   @PostMapping("/posts/{postId}/comments/{commentId}")
   public String deleteComment(
       @PathVariable(name = "postId") Long postId,

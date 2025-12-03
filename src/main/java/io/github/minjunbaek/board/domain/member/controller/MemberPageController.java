@@ -1,4 +1,4 @@
-package io.github.minjunbaek.board.web;
+package io.github.minjunbaek.board.domain.member.controller;
 
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
@@ -31,18 +31,18 @@ public class MemberPageController {
   private final MemberService memberService;
   private final BoardService boardService;
 
-  // 로그인 페이지
+  // 로그인 페이지로 이동
   @GetMapping("/login-form")
   public String loginPage(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @RequestParam(value = "error", required = false) String error,
       Model model
   ) {
-    // 1) 게시판 목록 (네가 쓰는 패턴 그대로)
+    // 네비게이션용 - 게시판 목록 조회
     List<BoardResponseDto> boards = boardService.readAllBoard();
     model.addAttribute("boards", boards);
 
-    // 2) 로그인 상태
+    // 네비게이션용 - 로그인 상태 정보
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
       model.addAttribute("memberPrincipalName", memberPrincipal.getName());
@@ -50,24 +50,24 @@ public class MemberPageController {
       model.addAttribute("loggedIn", false);
     }
 
-    // 3) 로그인 폼 객체
+    // 로그인 폼 객체 ==> 이것을 삭제하면 localhost에서 리디렉션한 횟수가 너무 많습니다. 라는 내용이 나옴 이유가 뭘까?
     if (!model.containsAttribute("loginForm")) {
       model.addAttribute("loginForm", new MemberLoginRequestDto());
     }
 
-    // 4) 로그인 실패 시 에러 플래그(스프링 시큐리티에서 ?error 붙여줄 예정)
+    // 로그인 실패 시 에러 플래그(스프링 시큐리티에서 ?error 붙여줄 예정)
     if (error != null) {
       model.addAttribute("loginError", true);
     }
 
-    return "login-form"; // templates/login-form.html
+    return "/members/login-form";
   }
 
   // 회원 가입 페이지로 이동
   @GetMapping("/join-form")
   public String joinForm(Model model) {
     model.addAttribute("register", new MemberRegisterDto());
-    return "join-form";
+    return "members/join-form";
   }
 
   // 회원 가입
@@ -75,13 +75,14 @@ public class MemberPageController {
   public String joinForm(
       @Validated @ModelAttribute("register") MemberRegisterDto memberRegisterDto,
       BindingResult bindingResult) {
+
     if (bindingResult.hasErrors()) {
-      return "join-form";
+      return "members/join-form";
     }
 
     memberService.register(memberRegisterDto);
 
-    return "redirect:/"; // 추후 login-form으로 이동하자
+    return "redirect:/members/login-form"; // 추후 login-form으로 이동하자
   }
 
   // 회원 탈퇴 페이지
@@ -93,21 +94,21 @@ public class MemberPageController {
       Model model
   ) {
 
-    // 게시판 목록 조회 (API에서 쓰던 로직 그대로 활용)
+    // 네비게이션용 - 게시판 목록 조회
     List<BoardResponseDto> boards = boardService.readAllBoard();
     model.addAttribute("boards", boards);
 
-    // 로그인 상태정보 확인
+    // 로그인 상태정보 확인 ==> 스프링 시큐리티가 이미 해줌
     if (memberPrincipal == null) {
       model.addAttribute("loggedIn", false);
-      return "redirect:/login";
+      return "redirect:/members/login-form";
     }
 
     model.addAttribute("loggedIn", true);
     model.addAttribute("memberPrincipalName", memberPrincipal.getName());
 
-    String memberEmail = memberPrincipal.getEmail();
-    MemberInformationDto member = memberService.getMyInformation(memberEmail);
+    Long memberId = memberPrincipal.getId();
+    MemberInformationDto member = memberService.getMyInformation(memberId);
     model.addAttribute("member", member);
 
     EditInformationRequestDto editForm = new EditInformationRequestDto();
@@ -115,7 +116,7 @@ public class MemberPageController {
     editForm.setAddress(member.getAddress());
     model.addAttribute("editForm", editForm);
 
-    return "my-information-form";
+    return "members/my-information-form";
   }
 
   // 내정보 수정
@@ -125,26 +126,21 @@ public class MemberPageController {
       @Validated @ModelAttribute("editForm") EditInformationRequestDto editForm,
       BindingResult bindingResult, Model model) {
 
-    // 게시판 목록 조회 (API에서 쓰던 로직 그대로 활용)
+    // 네비게이션용 - 게시판 목록 조회
     List<BoardResponseDto> boards = boardService.readAllBoard();
     model.addAttribute("boards", boards);
 
-    // 로그인 상태정보 확인
-    if (memberPrincipal == null) {
-      model.addAttribute("loggedIn", false);
-      return "redirect:/login";
-    }
     model.addAttribute("loggedIn", true);
     model.addAttribute("memberPrincipalName", memberPrincipal.getName());
 
     // 현재 내 정보 (이메일, 권한, 등)
-    String memberEmail = memberPrincipal.getEmail();
-    MemberInformationDto member = memberService.getMyInformation(memberEmail);
+    Long memberId = memberPrincipal.getId();
+    MemberInformationDto member = memberService.getMyInformation(memberId);
     model.addAttribute("member", member);
 
     // 1) DTO 검증(빈 비밀번호, 새 비밀번호 일치 여부 등)
     if (bindingResult.hasErrors()) {
-      return "my-information-form";
+      return "members/my-information-form";
     }
 
     // 2) 서비스 호출 (현재 비밀번호 검증 + 수정)
@@ -159,8 +155,8 @@ public class MemberPageController {
       } else {
         bindingResult.reject("editFailed", e.getMessage());
       }
-      return "my-information-form";
+      return "members/my-information-form";
     }
-    return "my-information-form";
+    return "members/my-information-form";
   }
 }

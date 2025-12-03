@@ -8,9 +8,12 @@ import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformation
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberUnregisterDto;
 import io.github.minjunbaek.board.domain.member.service.MemberService;
+import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
+import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,20 +30,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-// @RequestMapping("/members")
-public class MemberController {
+@RequestMapping("/api/members")
+public class MemberApiController {
 
   private final MemberService memberService;
+  private final PostService postService;
 
   // 회원 가입
-  // @PostMapping
+  @PostMapping
   public ResponseEntity<Api<Void>> register(@RequestBody @Validated MemberRegisterDto memberRegisterDto) {
     String result = memberService.register(memberRegisterDto);
     return ResponseEntity.status(201).body(Api.success("MEMBER_CREATED", result));
   }
 
   // 회원 탈퇴
-  // @PostMapping("/me")
+  @PostMapping("/me")
   public ResponseEntity<Api<Void>> unregister(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated@RequestBody MemberUnregisterDto memberUnregisterDto,
@@ -59,33 +63,37 @@ public class MemberController {
   }
 
   // 내정보 조회
-  // @GetMapping("/me")
+  @GetMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> viewMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
-    if (memberPrincipal == null) {
-      throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
-    }
 
-    MemberInformationDto informationDto = memberService.getMyInformation(memberPrincipal.getEmail());
+    MemberInformationDto informationDto = memberService.getMyInformation(memberPrincipal.getId());
 
     return ResponseEntity.ok(Api.success("MY_INFORMATION", "내정보 조회", informationDto));
   }
 
   // 내정보 수정
-  // @PatchMapping("/me")
+  @PatchMapping("/me")
   public ResponseEntity<Api<MemberInformationDto>> editMyInformation(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated @RequestBody EditInformationRequestDto requestDto) {
-
-    if (memberPrincipal == null) {
-      throw new ApiException(MemberErrorCode.MEMBER_NOT_FOUND);
-    }
 
     Long memberId = memberPrincipal.getId();
 
     MemberInformationDto informationDto = memberService.editMyInformation(memberId, requestDto);
 
     return ResponseEntity.ok(Api.success("MY_INFORMATION_CHANGE", "내정보 수정", informationDto));
+  }
+
+  // 내가 쓴 게시글 목록 조회
+  @GetMapping("/me/posts")
+  public ResponseEntity<Api<List<PostListResponseDto>>> viewMemberPosts(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal
+  ) {
+
+    List<PostListResponseDto> postListResponseDto = postService.readAllMemberPost(memberPrincipal.getId());
+
+    return ResponseEntity.ok(Api.success("VIEW_MY_POST_LIST", "사용자 게시글 목록 조회", postListResponseDto));
   }
 
   // 아이디 및 패스워드 찾기

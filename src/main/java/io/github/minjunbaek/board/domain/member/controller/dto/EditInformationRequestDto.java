@@ -29,24 +29,28 @@ public class EditInformationRequestDto {
   private String address;
 
   // 새 비밀번호와 새 비밀번호 확인이 일치하는지 확인
-  @AssertTrue(message = "새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.")
+  @AssertTrue(message = "새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.") // 이 메서드의 결과가 True 여야 유효
   public boolean isPasswordConfirmMatched() {
     boolean hasChangePassword = StringUtils.hasText(changePassword);
     boolean hasConfirmChangePassword = StringUtils.hasText(confirmPasswordChange);
 
+    // 둘다 값이 비어있을 경우 비밀번호 변경을 안하는 것으로 true로 통과
     if (!hasChangePassword && !hasConfirmChangePassword) {
       return true;
     }
+
+    // 값이 한쪽만 입력되어있는 경우 false를 반환하여 message 출력
+    if (hasChangePassword != hasConfirmChangePassword) {
+      return false;
+    }
+
     boolean result = changePassword.equals(confirmPasswordChange);
     return result;
   }
 
-  @AssertTrue(message = "새 비밀번호는 현재 비밀번호와 달라야 합니다.")
+  @AssertTrue(message = "새 비밀번호는 현재 비밀번호와 달라야 합니다.") // 이 메서드의 결과가 True 여야 유효
   public boolean isNewPasswordDifferentFromCurrent() {
-    if (!StringUtils.hasText(changePassword)){
-      return true;
-    }
-    if (!StringUtils.hasText(password)) {
+    if (!StringUtils.hasText(password) && !StringUtils.hasText(changePassword)){ // 현재 비밀번호와 새 비밀번호가 입력이 되었는지 확인
       return true;
     }
     return !password.equals(changePassword);

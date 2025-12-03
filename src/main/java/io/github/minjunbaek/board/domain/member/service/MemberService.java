@@ -24,9 +24,8 @@ public class MemberService{
 
   @Transactional
   public String register(MemberRegisterDto memberRegisterDto) {
-    if (memberRepository.existsByEmail(memberRegisterDto.getEmail())) {
-      throw new ApiException(MemberErrorCode.EMAIL_DUPLICATED);
-    }
+
+    duplicateEmailCheck(memberRegisterDto.getEmail());
 
     Member newMember = Member.of(memberRegisterDto.getEmail(), passwordEncoder.encode(memberRegisterDto.getPassword()),
         memberRegisterDto.getName(), memberRegisterDto.getAddress());
@@ -37,8 +36,7 @@ public class MemberService{
 
   @Transactional
   public String unregister(Long memberId, MemberUnregisterDto memberUnregisterDto) {
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+    Member member = findMember(memberId);
 
     if (!passwordEncoder.matches(memberUnregisterDto.getPassword(), member.getPassword())) {
       throw new ApiException(MemberErrorCode.LOGIN_FAILED);
@@ -49,8 +47,8 @@ public class MemberService{
   }
 
   @Transactional(readOnly = true)
-  public MemberInformationDto getMyInformation(String email) {
-    Member member = findMember(email);
+  public MemberInformationDto getMyInformation(Long memberId) {
+    Member member = findMember(memberId);
 
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString().substring(5));
@@ -81,7 +79,7 @@ public class MemberService{
       member.changeAddress(requestDto.getAddress());
     }
 
-    // 결과
+    // 결과 - Dto 로 변환하는 코드가 2번 중복되어 따로 메서드로 분리할수 있지만 굳이 하지 않음.
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
         member.getMemberRole().toString().substring(5));
   }
@@ -92,9 +90,10 @@ public class MemberService{
     return member;
   }
 
-  public Member findMember(String email) {
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-    return member;
+  // 이메일 중복 체크
+  private void duplicateEmailCheck(String email) {
+    if (memberRepository.existsByEmail(email)) {
+      throw new ApiException(MemberErrorCode.EMAIL_DUPLICATED);
+    }
   }
 }

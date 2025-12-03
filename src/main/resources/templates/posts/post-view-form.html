@@ -79,7 +79,7 @@
               }
 
               const response = await fetch(
-                `/posts/${postId}/comments/${commentId}`,
+                `/api/comments/${commentId}`,
                 {
                   method: "PATCH",
                   headers,

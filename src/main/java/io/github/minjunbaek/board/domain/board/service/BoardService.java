@@ -8,6 +8,8 @@ import io.github.minjunbaek.board.domain.board.repository.BoardRepository;
 import io.github.minjunbaek.board.domain.board.repository.entity.Board;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,7 @@ public class BoardService {
   // 게시판 조회(다수 조회)
   @Transactional(readOnly = true)
   public List<BoardResponseDto> readAllBoard() {
-    List<BoardResponseDto> boardList = boardRepository.findAll().stream()
+    List<BoardResponseDto> boardList = boardRepository.findAll(Sort.by(Direction.ASC, "id")).stream()
         .map(board -> BoardResponseDto.of(board.getId(), board.getBoardName())).toList();
     return boardList;
   }
