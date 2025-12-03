@@ -47,7 +47,7 @@ public class MemberApiController {
   @PostMapping("/me")
   public ResponseEntity<Api<Void>> unregister(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-      @Validated@RequestBody MemberUnregisterDto memberUnregisterDto,
+      @Validated @RequestBody MemberUnregisterDto memberUnregisterDto,
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse) {
 

@@ -8,13 +8,19 @@ import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRe
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberLoginRequestDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberRegisterDto;
+import io.github.minjunbaek.board.domain.member.controller.dto.MemberUnregisterDto;
 import io.github.minjunbaek.board.domain.member.service.MemberService;
 import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -80,6 +86,14 @@ public class MemberPageController {
       BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
+      return "members/join-form";
+    }
+
+    try {
+      memberService.register(memberRegisterDto);
+    } catch (ApiException e) {
+      // 에러코드에 따라 글로벌 에러 추가
+      bindingResult.reject(e.getErrorCodeInterface().getStatusCode(), e.getErrorCodeInterface().getDescription());
       return "members/join-form";
     }
 
@@ -178,5 +192,73 @@ public class MemberPageController {
     model.addAttribute("posts", posts);
 
     return "members/my-posts-form";
+  }
+
+  @GetMapping("/me/withdraw")
+  public String unregisterPage(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
+
+    // 네비게이션용 - 게시판 목록 조회
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    model.addAttribute("loggedIn", true);
+    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
+    model.addAttribute("memberPrincipalEmail", memberPrincipal.getEmail());
+
+    MemberUnregisterDto unregisterDto = new MemberUnregisterDto();
+    model.addAttribute("unregister", unregisterDto);
+
+
+    return "members/my-unregister-form";
+  }
+
+  // 회원 탈퇴 POST (폼 제출)
+  @PostMapping("/me/withdraw")
+  public String unregisterMemberPost(
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+      @Validated @ModelAttribute("unregister") MemberUnregisterDto unregisterDto,
+      BindingResult bindingResult,
+      Model model,
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    // 네비게이션용 - 게시판 목록 조회
+    List<BoardResponseDto> boards = boardService.readAllBoard();
+    model.addAttribute("boards", boards);
+
+    if (memberPrincipal == null) {
+      return "redirect:/members/login-form";
+    }
+
+    model.addAttribute("loggedIn", true);
+    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
+    model.addAttribute("memberPrincipalEmail", memberPrincipal.getEmail());
+
+    if (bindingResult.hasErrors()) {
+      // 비밀번호 NotBlank 같은 DTO 검증 에러
+      return "members/my-unregister-form";
+    }
+
+    try {
+      Long memberId = memberPrincipal.getId();
+      String result = memberService.unregister(memberId, unregisterDto);
+
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      if (auth != null) {
+        new SecurityContextLogoutHandler().logout(request, response, auth);
+      }
+
+      // 탈퇴 성공 후 로그인 페이지나 메인으로 리다이렉트
+      return "redirect:/members/login-form?unregisterSuccess";
+
+    } catch (ApiException e) {
+      // 비밀번호 불일치 같은 비즈니스 에러
+      if (e.getErrorCodeInterface() == MemberErrorCode.LOGIN_FAILED) {
+        bindingResult.rejectValue("password", "invalidPassword", "비밀번호가 일치하지 않습니다.");
+      } else {
+        bindingResult.reject("unregisterFailed", e.getMessage());
+      }
+      return "members/my-unregister-form";
+    }
   }
 }
