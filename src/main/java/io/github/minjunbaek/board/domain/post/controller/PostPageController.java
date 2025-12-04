@@ -29,23 +29,9 @@ public class PostPageController {
   // 게시글 등록 폼으로 이동
   @GetMapping("/boards/{boardId}/posts-form")
   public String createPostForm(
-      @PathVariable(name = "boardId") Long boardId,
-      @AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
+      @PathVariable(name = "boardId") Long boardId, Model model) {
 
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    // 네비게이션용 - 로그인 상태 정보
-    if (memberPrincipal != null) {
-      model.addAttribute("loggedIn", true);
-      model.addAttribute("memberId", memberPrincipal.getId());
-      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
-    } else {
-      model.addAttribute("loggedIn", false);
-    }
-
-    // 3) 내용
+    // 내용
     BoardResponseDto board = boardService.readBoard(boardId);
     model.addAttribute("selectedBoardId", board.getId());
     model.addAttribute("boardTitle", board.getBoardName());
@@ -73,9 +59,6 @@ public class PostPageController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model
   ) {
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
 
     // 게시글 조회
     PostResponseDto post = postService.readPost(postId);
@@ -88,12 +71,8 @@ public class PostPageController {
 
     // 네비게이션용 - 로그인 상태 정보
     if (memberPrincipal != null) {
-      model.addAttribute("loggedIn", true);
-      model.addAttribute("memberId", memberPrincipal.getId());
-      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
       model.addAttribute("isPostAuthor", memberPrincipal.getId().equals(post.getMemberId()));
     } else {
-      model.addAttribute("loggedIn", false);
       model.addAttribute("isPostAuthor", false);
     }
 
@@ -106,19 +85,6 @@ public class PostPageController {
       @PathVariable(name = "postId") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model) {
-
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    // 네비게이션용 - 로그인 상태 정보
-    if (memberPrincipal != null) {
-      model.addAttribute("loggedIn", true);
-      model.addAttribute("memberId", memberPrincipal.getId());
-      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
-    } else {
-      model.addAttribute("loggedIn", false);
-    }
 
     // 게시글 수정 - 기존 게시글에 있던 데이터 불러오기
     PostResponseDto post = postService.editReadPost(postId);

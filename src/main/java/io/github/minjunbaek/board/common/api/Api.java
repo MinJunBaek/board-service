@@ -24,8 +24,4 @@ public class Api<T> {
   public static Api<Void> failure(String statusCode, String description) {
     return Api.of(false, statusCode, description, null);
   }
-
-  public static <T> Api<T> failure(String statusCode, String description, T data) {
-    return Api.of(false, statusCode, description, data);
-  }
 }

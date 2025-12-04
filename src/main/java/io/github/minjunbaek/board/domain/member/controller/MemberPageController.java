@@ -2,7 +2,6 @@ package io.github.minjunbaek.board.domain.member.controller;
 
 import io.github.minjunbaek.board.common.error.MemberErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
-import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.member.controller.dto.EditInformationRequestDto;
 import io.github.minjunbaek.board.domain.member.controller.dto.MemberInformationDto;
@@ -42,23 +41,8 @@ public class MemberPageController {
 
   // 로그인 페이지로 이동
   @GetMapping("/login-form")
-  public String loginPage(
-      @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-      @RequestParam(value = "error", required = false) String error,
-      Model model
+  public String loginPage(@RequestParam(value = "error", required = false) String error, Model model
   ) {
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    // 네비게이션용 - 로그인 상태 정보
-    if (memberPrincipal != null) {
-      model.addAttribute("loggedIn", true);
-      model.addAttribute("memberPrincipalName", memberPrincipal.getName());
-    } else {
-      model.addAttribute("loggedIn", false);
-    }
-
     // 로그인 폼 객체 ==> 이것을 삭제하면 localhost에서 리디렉션한 횟수가 너무 많습니다. 라는 내용이 나옴 이유가 뭘까?
     if (!model.containsAttribute("loginForm")) {
       model.addAttribute("loginForm", new MemberLoginRequestDto());
@@ -97,12 +81,8 @@ public class MemberPageController {
       return "members/join-form";
     }
 
-    memberService.register(memberRegisterDto);
-
     return "redirect:/members/login-form"; // 추후 login-form으로 이동하자
   }
-
-  // 회원 탈퇴 페이지
 
   // 내정보 조회 및 수정 페이지로 이동
   @GetMapping("/me")
@@ -110,19 +90,6 @@ public class MemberPageController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model
   ) {
-
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    // 로그인 상태정보 확인 ==> 스프링 시큐리티가 이미 해줌
-    if (memberPrincipal == null) {
-      model.addAttribute("loggedIn", false);
-      return "redirect:/members/login-form";
-    }
-
-    model.addAttribute("loggedIn", true);
-    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
 
     Long memberId = memberPrincipal.getId();
     MemberInformationDto member = memberService.getMyInformation(memberId);
@@ -142,13 +109,6 @@ public class MemberPageController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated @ModelAttribute("editForm") EditInformationRequestDto editForm,
       BindingResult bindingResult, Model model) {
-
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    model.addAttribute("loggedIn", true);
-    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
 
     // 현재 내 정보 (이메일, 권한, 등)
     Long memberId = memberPrincipal.getId();
@@ -180,13 +140,6 @@ public class MemberPageController {
   @GetMapping("/me/posts")
   public String viewMyPostList(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
 
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    model.addAttribute("loggedIn", true);
-    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
-
     Long memberId = memberPrincipal.getId();
     List<PostListResponseDto> posts = postService.readAllMemberPost(memberId);
     model.addAttribute("posts", posts);
@@ -197,17 +150,10 @@ public class MemberPageController {
   @GetMapping("/me/withdraw")
   public String unregisterPage(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
 
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
-
-    model.addAttribute("loggedIn", true);
-    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
     model.addAttribute("memberPrincipalEmail", memberPrincipal.getEmail());
 
     MemberUnregisterDto unregisterDto = new MemberUnregisterDto();
     model.addAttribute("unregister", unregisterDto);
-
 
     return "members/my-unregister-form";
   }
@@ -222,16 +168,7 @@ public class MemberPageController {
       HttpServletRequest request,
       HttpServletResponse response
   ) {
-    // 네비게이션용 - 게시판 목록 조회
-    List<BoardResponseDto> boards = boardService.readAllBoard();
-    model.addAttribute("boards", boards);
 
-    if (memberPrincipal == null) {
-      return "redirect:/members/login-form";
-    }
-
-    model.addAttribute("loggedIn", true);
-    model.addAttribute("memberPrincipalName", memberPrincipal.getName());
     model.addAttribute("memberPrincipalEmail", memberPrincipal.getEmail());
 
     if (bindingResult.hasErrors()) {
