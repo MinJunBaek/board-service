@@ -21,9 +21,10 @@ public class BoardService {
   private final BoardRepository boardRepository;
 
   // 게시판 생성
-  public void createBoard(BoardRequestDto requestDto) {
+  public Long createBoard(BoardRequestDto requestDto) {
     Board board = Board.create(requestDto.getBoardName());
     boardRepository.save(board);
+    return board.getId();
   }
 
   // 게시판 조회(단일 조회)
@@ -42,7 +43,7 @@ public class BoardService {
     return boardList;
   }
 
-  // 게시판 수정
+  // 게시판 수정 ==> 게시판 수정시 중복체크가 필요할듯 하다
   public BoardResponseDto editBoard(Long boardId, BoardRequestDto requestDto) {
     Board board = findBoard(boardId);
     board.changeBoardName(requestDto.getBoardName());

@@ -3,3 +3,7 @@ spring:
     name: board-service
   profiles:
     default: local
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true

@@ -1,3 +1,4 @@
+<!-- post-create-form.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
   <head>
@@ -67,7 +68,8 @@
             <!-- 버튼 영역 -->
             <div class="d-flex justify-content-end gap-2">
               <a class="btn btn-secondary"
-                 th:href="@{|/boards/${selectedBoardId}/posts|}">
+                 th:href="${selectedBoardId} != null ?
+                 @{|/boards/${selectedBoardId}/posts|} : @{/}">
                 취소
               </a>
               <button type="submit" class="btn btn-primary">등록</button>

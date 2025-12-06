@@ -6,6 +6,7 @@ import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,9 @@ public class BoardApiController {
   // 게시판 생성
   @PostMapping
   public ResponseEntity<Api<Void>> create(@Validated @RequestBody BoardRequestDto requestDto) {
-    boardService.createBoard(requestDto);
-    return ResponseEntity.ok(Api.success("CREATE_BOARD", "게시판 생성"));
+    Long createdId = boardService.createBoard(requestDto);
+    URI location = URI.create("/api/boards/" + createdId);
+    return ResponseEntity.created(location).body(Api.success("CREATE_BOARD", "게시판 생성"));
   }
 
   // 게시판 조회(단일 조회) -> 생각해보면 게시판의 게시글 목록이 중요하지 게시판 이름이 중요하지 않음...

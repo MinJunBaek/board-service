@@ -33,20 +33,18 @@ public class CommentService {
         comment.getContent(),
         comment.getMember().getId(),
         comment.getMember().getName(),
-        comment.getUpdatedAt()
+        comment.getCreatedAt()
         )).toList();
     return commentResponseDtoList;
   }
 
   // 댓글 등록
   public void createComment(Long postId, Long memberId, CommentRequestDto commentRequestDto) {
-    Member member = memberService.findMember(memberId);
-    Post post = postService.findPost(postId);
+    Member member = memberService.findMember(memberId); // ==> 조회 전용 클래스를 만들까?를 생각하게 된 원인
+    Post post = postService.findPost(postId); // ==> 조회 전용 클래스를 만들까?를 생각하게 된 원인
     Comment comment = Comment.create(commentRequestDto.getContent(), member, post);
     commentRepository.save(comment);
   }
-
-  // 권한 필요: 댓글의 수정 삭제 기능은 해당 유저만 권한을 갖는다.
 
   // 댓글 수정 (권한 필요)
   public CommentResponseDto editComment(Long commentId, Long memberId, CommentRequestDto commentRequestDto) {
@@ -59,7 +57,7 @@ public class CommentService {
     comment.changeContent(commentRequestDto.getContent());
 
     return CommentResponseDto.of(comment.getId(), comment.getContent(), comment.getMember().getId(),
-        comment.getMember().getName(), comment.getUpdatedAt());
+        comment.getMember().getName(), comment.getCreatedAt());
   }
 
   // 댓글 삭제 (권한 필요)

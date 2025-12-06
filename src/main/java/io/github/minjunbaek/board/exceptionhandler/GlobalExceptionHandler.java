@@ -4,8 +4,12 @@ import io.github.minjunbaek.board.common.api.Api;
 import io.github.minjunbaek.board.common.error.CommonErrorCode;
 import io.github.minjunbaek.board.common.error.ErrorCodeInterface;
 import io.github.minjunbaek.board.common.exception.ApiException;
+import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,40 +19,82 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionHandler {
 
+  private void logError(
+      String type,
+      ErrorCodeInterface errorCode,
+      Object detail,
+      Throwable e
+  ) {
+    log.warn("[{}] httpStatus={}, statusCode={}, description={}, detail={}",
+        type,
+        errorCode.getHttpStatus(),
+        errorCode.getStatusCode(),
+        errorCode.getDescription(),
+        detail,
+        e
+    );
+  }
+
   /**
    * 비즈니스 로직에서 명시적으로 던지는 ApiException 처리
    */
   @ExceptionHandler(ApiException.class)
   public ResponseEntity<Api<Void>> handleApiException(ApiException e) {
     ErrorCodeInterface errorCode = e.getErrorCodeInterface();
-    log.warn("ApiException 발생: statusCode={}, description={}",
-        errorCode.getStatusCode(), errorCode.getDescription());
+
+    logError("ApiException", errorCode, null, e);
 
     return ResponseEntity.status(errorCode.getHttpStatus())
         .body(Api.failure(errorCode.getStatusCode(), errorCode.getDescription()));
   }
 
   /**
-   * @Valid 검증 실패 등의 예외 처리
+   * @Valid / @Validated 바인딩 실패 (DTO 필드 검증)
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Api<Void>> handleValidationException(MethodArgumentNotValidException e) {
+  public ResponseEntity<Api<Map<String, String>>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    ErrorCodeInterface errorCode = CommonErrorCode.INVALID_INPUT_VALUE;
+    Map<String, String> errors = new HashMap<>();
+
+    for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+      errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+    }
+
+    logError("MethodArgumentNotValidException", errorCode, errors, e);
+
+    return ResponseEntity
+        .status(errorCode.getHttpStatus())
+        .body(Api.failure(
+            errorCode.getStatusCode(),
+            errorCode.getDescription(),
+            errors
+        ));
+  }
+
+  /**
+   * RequestParam, PathVariable 등에서의 검증 실패
+   */
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<Api<String>> handleConstraintViolation(ConstraintViolationException e) {
     ErrorCodeInterface errorCode = CommonErrorCode.INVALID_INPUT_VALUE;
 
-    String detailMessage = e.getBindingResult().getFieldErrors().stream()
-        .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-        .findFirst()
-        .orElse(errorCode.getDescription());
+    logError("ConstraintViolationException", errorCode, e.getMessage(), e);
 
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(Api.failure(errorCode.getStatusCode(),
-        detailMessage));
+    return ResponseEntity
+        .status(errorCode.getHttpStatus())
+        .body(Api.failure(
+            errorCode.getStatusCode(),
+            errorCode.getDescription(),
+            e.getMessage()
+        ));
   }
+
   /**
    * 그 밖의 예상하지 못한 예외 처리
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Api<Void>> handleException(Exception e) {
-    log.error("예상하지 못한 예외 발생", e);
+    log.error("[Exception] : message={}", e.getMessage(), e);
 
     ErrorCodeInterface errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
 
@@ -56,4 +102,5 @@ public class GlobalExceptionHandler {
         .status(errorCode.getHttpStatus())
         .body(Api.failure(errorCode.getStatusCode(), errorCode.getDescription()));
   }
+
 }

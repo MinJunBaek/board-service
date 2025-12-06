@@ -1,3 +1,4 @@
+<!-- post-view-form.html -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head>
@@ -94,15 +95,15 @@
 
               const api = await response.json();
               // Api.success(code, message, data) 구조라면 이게 정석
-              const updated = api.data ?? api;
+              const created = api.data ?? api;
 
               const viewArea = root.querySelector(".comment-view");
               const contentP = viewArea.querySelector("p");
               contentP.innerHTML = newContent.replace(/\n/g, "<br/>");
 
               const dateSpan = root.querySelector(".comment-date");
-              if (updated && updated.updatedAt) {
-                const formatted = updated.updatedAt
+              if (created && created.createdAt) {
+                const formatted = created.createdAt
                   .substring(0, 16)
                   .replace("T", " ");
                 dateSpan.innerText = formatted;
@@ -130,7 +131,7 @@
         <div class="text-muted small">
           <span th:text="'작성자 : ' + ${post.memberName}">작성자</span>
           &nbsp;|&nbsp;
-          <span th:text="'작성일 : ' + ${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+          <span th:text="'작성일 : ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
           &nbsp;|&nbsp;
           <span th:text="'조회수 : ' + ${post.viewCount}">조회수</span>
         </div>
@@ -160,7 +161,7 @@
             수정
           </a>
 
-          <form th:action="@{|/boards/${post.boardId}/posts/${post.id}|}" method="post" class="d-inline">
+          <form th:action="@{|/posts/${post.id}|}" method="post" class="d-inline">
             <!-- HiddenHttpMethodFilter 사용 시 -->
             <input type="hidden" name="_method" value="delete" />
             <button type="submit" class="btn btn-outline-danger">
@@ -177,7 +178,7 @@
         <h5>댓글 작성</h5>
 
         <!-- 로그인한 사람만 댓글 작성 가능 -->
-        <div th:if="${memberId != null}">
+        <div th:if="${memberPrincipalId != null}">
           <form th:action="@{|/posts/${post.id}/comments|}" method="post">
             <div class="mb-3">
             <textarea class="form-control" name="content" rows="3"
@@ -187,9 +188,9 @@
           </form>
         </div>
 
-        <div th:if="${memberId == null}">
+        <div th:if="${memberPrincipalId == null}">
           <p class="text-muted">
-            댓글을 작성하려면 <a th:href="@{/login}">로그인</a>이 필요합니다.
+            댓글을 작성하려면 <a th:href="@{/members/login-form}">로그인</a>이 필요합니다.
           </p>
         </div>
       </div>
@@ -211,13 +212,13 @@
             <div>
               <strong th:text="${comment.memberName}">작성자</strong>
               <span class="text-muted small comment-date"
-                    th:text="${#temporals.format(comment.updatedAt, 'yyyy-MM-dd HH:mm')}">
+                    th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">
           날짜
         </span>
             </div>
 
             <!-- 댓글 작성자만 수정/삭제 -->
-            <div th:if="${loggedIn != null and memberId == comment.memberId}">
+            <div th:if="${loggedIn != null and memberPrincipalId == comment.memberId}">
               <!-- 수정: JS로 inline 수정 -->
               <button type="button"
                       class="btn btn-sm btn-outline-secondary me-1 comment-edit-btn"

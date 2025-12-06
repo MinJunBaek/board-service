@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -67,8 +68,9 @@ public class MemberPageController {
   @PostMapping("/join")
   public String joinForm(
       @Validated @ModelAttribute("register") MemberRegisterDto memberRegisterDto,
-      BindingResult bindingResult) {
+      BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
+    // 폼 검즘 시 에러가 있다면 그대로 회원가입 폼으로
     if (bindingResult.hasErrors()) {
       return "members/join-form";
     }
@@ -80,6 +82,12 @@ public class MemberPageController {
       bindingResult.reject(e.getErrorCodeInterface().getStatusCode(), e.getErrorCodeInterface().getDescription());
       return "members/join-form";
     }
+
+    // 회원가입 성공
+    redirectAttributes.addFlashAttribute(
+        "joinSuccessMessage",
+        "회원가입이 완료되었습니다. 로그인 해 주세요."
+    );
 
     return "redirect:/members/login-form"; // 추후 login-form으로 이동하자
   }

@@ -14,11 +14,11 @@ public class PostResponseDto { // 이러한 DTO는 결국 도메인에 의존하
   private Long memberId;
   private String memberName;
   private Long boardId;
-  private LocalDateTime updatedAt;
+  private LocalDateTime createdAt;
 
   public static PostResponseDto of(
       Long id, String title, String content, int likeCount, int viewCount,
-      Long memberId, String memberName, Long boardId, LocalDateTime updatedAt) {
+      Long memberId, String memberName, Long boardId, LocalDateTime createAt) {
     PostResponseDto dto = new PostResponseDto();
     dto.id = id;
     dto.title = title;
@@ -28,7 +28,7 @@ public class PostResponseDto { // 이러한 DTO는 결국 도메인에 의존하
     dto.memberId = memberId;
     dto.memberName = memberName;
     dto.boardId = boardId;
-    dto.updatedAt = updatedAt;
+    dto.createdAt = createAt;
     return dto;
   }
 }

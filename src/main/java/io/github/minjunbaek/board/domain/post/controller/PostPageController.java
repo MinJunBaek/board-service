@@ -1,5 +1,8 @@
 package io.github.minjunbaek.board.domain.post.controller;
 
+import io.github.minjunbaek.board.common.error.CommonErrorCode;
+import io.github.minjunbaek.board.common.error.MemberErrorCode;
+import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.comment.controller.dto.CommentResponseDto;
@@ -14,7 +17,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -86,14 +91,26 @@ public class PostPageController {
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model) {
 
+    // 비 로그인 유저의 잘못된 접근 차단
+    if (memberPrincipal == null) {
+      return "/members/login-form";
+    }
+
     // 게시글 수정 - 기존 게시글에 있던 데이터 불러오기
     PostResponseDto post = postService.editReadPost(postId);
+
+    // 권한 없는 로그인 유저의 잘못된 접근 차단
+    if (!memberPrincipal.getId().equals(post.getMemberId())) {
+      return "redirect:/posts/" + postId + "/posts-form";
+    }
+
     model.addAttribute("post", post);
+
     return "posts/post-edit-form";
   }
 
   // 게시글 수정
-  @PostMapping("/posts/{postId}")
+  @PatchMapping("/posts/{postId}")
   public String editPost(
       @PathVariable(name = "postId") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
@@ -105,14 +122,14 @@ public class PostPageController {
   }
 
   // 게시글 삭제
-  @PostMapping("/boards/{boardId}/posts/{postId}")
+  // @PostMapping("/boards/{boardId}/posts/{postId}")
+  @DeleteMapping("/posts/{postId}")
   public String deletePost(
-      @PathVariable(name = "boardId") Long boardId,
       @PathVariable(name = "postId") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
 
     Long memberId = memberPrincipal.getId();
-    postService.deletePost(postId, memberId);
+    Long boardId = postService.deletePost(postId, memberId);
 
     return "redirect:/boards/" + boardId + "/posts";
   }

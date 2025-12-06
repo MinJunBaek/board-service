@@ -1,3 +1,4 @@
+<!-- view-posts.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
   <head>
@@ -42,10 +43,11 @@
           <th style="width: 100px;">조회수</th>
         </tr>
         </thead>
+
         <tbody>
         <tr th:each="post : ${posts}">
           <!-- 번호 -->
-          <td th:text="${post.id}">0</td>
+          <td th:text="${post.id}">1</td>
 
           <!-- 제목 + (오른쪽에) 수정/삭제 버튼 -->
           <td>
@@ -57,7 +59,7 @@
               </a>
 
               <!-- 🔹 로그인 + 작성자 본인일 때만 버튼 노출 -->
-              <div th:if="${loggedIn and memberPrincipalName == post.memberName}"
+              <div th:if="${loggedIn and memberPrincipalId == post.memberId}"
                    class="d-inline-flex gap-1 ms-2">
 
                 <!-- 수정 버튼: 삭제와 같은 형태의 button -->
@@ -69,7 +71,7 @@
                 </form>
 
                 <!-- 삭제 버튼 -->
-                <form th:action="@{|/boards/${board.id}/posts/${post.id}|}" method="post"
+                <form th:action="@{|/posts/${post.id}|}" method="post"
                       class="m-0 d-inline-block"
                       onsubmit="return confirm('정말 삭제하시겠습니까?');">
                   <input type="hidden" name="_method" value="delete"/>
@@ -81,7 +83,7 @@
             </div>
           </td>
           <td>
-            <div th:text=${post.memberName}>
+            <div th:text="${post.memberName}">
               작성자
             </div>
           </td>

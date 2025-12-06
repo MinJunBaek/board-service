@@ -19,7 +19,7 @@ public class MemberUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Member member = memberRepository.findByEmail(username)
-        .orElseThrow(() -> new ApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(() -> new UsernameNotFoundException("회원 정보를 찾을 수 없습니다."));
     return new MemberPrincipal(member);
   }
 }

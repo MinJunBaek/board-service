@@ -51,7 +51,7 @@ public class MemberService{
     Member member = findMember(memberId);
 
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
-        member.getMemberRole().toString().substring(5));
+        member.getMemberRole().getRole());
   }
 
   @Transactional
@@ -81,7 +81,7 @@ public class MemberService{
 
     // 결과 - Dto 로 변환하는 코드가 2번 중복되어 따로 메서드로 분리할수 있지만 굳이 하지 않음.
     return MemberInformationDto.of(member.getEmail(), member.getName(), member.getAddress(),
-        member.getMemberRole().toString().substring(5));
+        member.getMemberRole().getRole());
   }
 
   public Member findMember(Long memberId) {

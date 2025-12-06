@@ -30,7 +30,7 @@ public class GlobalPageControllerAdvice {
     // 네비게이션용 - 로그인 상태 정보
     if (memberPrincipal != null) {
       model.addAttribute("loggedIn", true);
-      model.addAttribute("memberId", memberPrincipal.getId());
+      model.addAttribute("memberPrincipalId", memberPrincipal.getId());
       model.addAttribute("memberPrincipalName", memberPrincipal.getName());
     } else {
       model.addAttribute("loggedIn", false);

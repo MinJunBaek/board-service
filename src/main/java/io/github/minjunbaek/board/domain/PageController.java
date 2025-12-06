@@ -23,7 +23,7 @@ public class PageController {
   }
 
   // 메인 페이지에서 게시글 등록 폼으로 이동
-  @GetMapping("/posts-form")
+  @GetMapping("/posts-form") // 메인페이지는 boardId가 없기때문에 리다이랙트를 시켜주는 용도
   public String createPostForm() {
     return "posts/post-create-form";
   }

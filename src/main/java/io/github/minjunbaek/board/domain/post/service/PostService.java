@@ -104,10 +104,12 @@ public class PostService {
   }
 
   // 게시글 삭제
-  public void deletePost(Long postId, Long memberId) {
+  public Long deletePost(Long postId, Long memberId) {
     Post post = findPost(postId);
     postPermissionCheck(post.getMember().getId(), memberId);
+    Long boardId = post.getBoard().getId();
     postRepository.delete(post);
+    return boardId;
   }
 
   // 해당 게시글 찾기

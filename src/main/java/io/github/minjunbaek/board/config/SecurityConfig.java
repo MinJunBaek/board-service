@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -67,7 +66,9 @@ public class SecurityConfig {
         )
 
         // H2 콘솔용 헤더/CSRF 예외
-        .headers(h -> h.frameOptions(frame -> frame.disable()));
+        .headers(h -> h.frameOptions(frame -> frame.disable()))
+        // .csrf(csrf -> csrf.disable()) ==> Swagger에서 API를 호출하기 위해서는 CSRF를 꺼야함.
+        ;
 
     return httpSecurity.build();
   }
