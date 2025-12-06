@@ -1,0 +1,17 @@
+# application-dev.yaml
+spring:
+  datasource: # Spring Boot가 자동으로 DataSource를 만들어 줄 때 참조하는 기본 키들
+    # docker-compose에서 만든 MySQL과 연결
+    url: jdbc:mysql://localhost:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_USER} #compose에 설정한 MYSQL_USER
+    password: ${MYSQL_PASSWORD} #compose에 설정한 MYSQL_PASSWORD
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버 클래스
+
+  jpa:
+    hibernate:
+      ddl-auto: update # JPA 엔티티 기준으로 스키마를 자동으로 맞춰줌.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect # Hibernate에게 “너 지금 MySQL 8에 맞춰 SQL 만들어”라고 알려주는 설정.
+        format_sql: true # 콘솔에 예쁘게 SQL 찍어보려고 넣는 개발용 옵션.
+    show-sql: true

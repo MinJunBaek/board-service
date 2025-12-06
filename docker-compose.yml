@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:8.0 # mysql:latest -> MySQL의 최신버전의 이미지를 사용
+    container_name: board-service-container # 컨테이너 실제 이름. docker ps에 찍히는 이름
+    environment: # MySQL 컨테이너에 환경 변수로 설정 전달
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # root 계정 비밀번호
+      MYSQL_DATABASE: ${MYSQL_DATABASE} # 처음 만들 기본 DB 이름
+      MYSQL_USER: ${MYSQL_USER} # 애플리케이션에서 사용할 계정 이름
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} # 애플리케잇녀에서 사용할 계정 비밀번호
+      TZ: Asia/Seoul # 컨테이너 타임존
+    ports:
+      - "3306:3306" # 호스트(로컬PC)의 3306에서 컨테이너의 3306 매핑
+    command: # MySQL 서버 실행 시 추가 옵션
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci # 한글 + 이모지까지 잘 되는 기본 셋팅.
+      - --skip-character-set-client-handshake # 클라이언트가 엉뚱한 인코딩으로 덮어쓰지 못하게 함.
+    volumes:
+      - board-service-data:/var/lib/mysql # 컨테이너 내부 DB 파일 위치를 호스트의 named volume(board-service-data)에 연결 컨테이너 삭제해도 데이터 유지
+
+volumes:
+  board-service-data: # 이름만 정의해두먼 Docker가 실제 경로는 알아서 관리.
+    name: board-service-data # 이름을 정해주지 않으면 board_라는 접두어가 붙어버림.

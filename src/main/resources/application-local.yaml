@@ -1,9 +1,11 @@
+# application-local.yaml
 spring:
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/h2database;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:tcp://localhost/~/h2database;MODE=MySQL;DATABASE_TO_LOWER=TRUE;
     username: sa
     password:
+
   jpa:
     properties:
       hibernate:
@@ -11,8 +13,3 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console

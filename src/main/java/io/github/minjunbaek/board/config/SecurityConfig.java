@@ -37,10 +37,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             // Swagger(OpenAPI) & Scalar
             .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").permitAll()
-            // H2 콘솔
-            .requestMatchers("/h2-console/**").permitAll()
             // 익명 허용(메인페이지, 회원가입)
             .requestMatchers("/", "/members/join-form", "/members/join").permitAll()
+            // 익명 사용자의 게시글 목록 조회 허용
             .requestMatchers(HttpMethod.GET, "/boards/*/posts").permitAll()
             // 그 외는 인증
             .anyRequest().authenticated()
@@ -57,6 +56,7 @@ public class SecurityConfig {
             .failureUrl("/members/login-form?error") // 실패 시 다시 로그인 페이지 + ?error
             .permitAll()
         )
+
         // 기본 로그아웃 폼 사용
         .logout(logout -> logout
             .logoutUrl("/logout")           // 로그아웃 요청 URL (POST로 쓰는 게 기본)
@@ -65,8 +65,6 @@ public class SecurityConfig {
             .deleteCookies("JSESSIONID")
         )
 
-        // H2 콘솔용 헤더/CSRF 예외
-        .headers(h -> h.frameOptions(frame -> frame.disable()))
         // .csrf(csrf -> csrf.disable()) ==> Swagger에서 API를 호출하기 위해서는 CSRF를 꺼야함.
         ;
 

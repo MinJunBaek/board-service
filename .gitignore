@@ -268,3 +268,6 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+
+# 환경변수 추가
+.env
