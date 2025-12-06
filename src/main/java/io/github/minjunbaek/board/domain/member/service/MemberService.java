@@ -96,7 +96,7 @@ public class MemberService{
       throw new ApiException(MemberErrorCode.EMAIL_DUPLICATED);
     }
 
-    if (memberRepository.existsDeletedByEmail(email)) {
+    if (memberRepository.existsByEmailAndDeletedAtIsNotNull(email)) {
       throw new ApiException(MemberErrorCode.EMAIL_WITHDRAWN);
     }
   }
