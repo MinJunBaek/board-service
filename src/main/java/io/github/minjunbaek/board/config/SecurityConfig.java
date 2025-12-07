@@ -65,7 +65,7 @@ public class SecurityConfig {
             .deleteCookies("JSESSIONID")
         )
 
-        // .csrf(csrf -> csrf.disable()) ==> Swagger에서 API를 호출하기 위해서는 CSRF를 꺼야함.
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")) // ==> Swagger에서 API를 호출하기 위해서는 CSRF를 꺼야함.
         ;
 
     return httpSecurity.build();
