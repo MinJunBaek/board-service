@@ -54,7 +54,7 @@ public class MemberPageController {
       model.addAttribute("loginError", true);
     }
 
-    return "/members/login-form";
+    return "members/login-form";
   }
 
   // 회원 가입 페이지로 이동
