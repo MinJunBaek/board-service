@@ -36,7 +36,7 @@ public class SecurityConfig {
         // 요청 인가
         .authorizeHttpRequests(auth -> auth
             // Swagger(OpenAPI) & Scalar
-            .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").permitAll()
+            .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").hasRole("ADMIN")
             // 익명 허용(메인페이지, 회원가입)
             .requestMatchers("/", "/members/join-form", "/members/join").permitAll()
             // 익명 사용자의 게시글 목록 조회 허용
