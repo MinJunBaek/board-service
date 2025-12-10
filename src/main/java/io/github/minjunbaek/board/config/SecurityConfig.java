@@ -35,7 +35,10 @@ public class SecurityConfig {
 
         // 요청 인가
         .authorizeHttpRequests(auth -> auth
-            // Swagger(OpenAPI) & Scalar
+            // 모든 API 요청은 관리자만 가능 (댓글 수정은 제외)
+            .requestMatchers("/api/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PATCH, "/api/comments/**").authenticated()
+            // Swagger(OpenAPI) & Scalar => 관리자 전용
             .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/scalar/**").hasRole("ADMIN")
             // 익명 허용(메인페이지, 회원가입)
             .requestMatchers("/", "/members/join-form", "/members/join").permitAll()

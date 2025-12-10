@@ -1,0 +1,85 @@
+<!-- post-list.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+
+    <!-- 게시글 목록 공통 Fragment -->
+    <div th:fragment="postList(posts, loggedIn, memberPrincipalId)">
+
+      <!-- 게시글이 없는 경우 -->
+      <div class="alert alert-info" th:if="${#lists.isEmpty(posts)}">
+        아직 작성된 게시글이 없습니다.
+      </div>
+
+      <!-- 게시글 목록 테이블 -->
+      <table class="table table-hover" th:if="${!#lists.isEmpty(posts)}">
+        <thead class="table-light">
+        <tr>
+          <th style="width: 80px;">번호</th>
+          <th>제목</th>
+          <th style="width: 100px;">작성자</th>
+          <th style="width: 100px;">좋아요</th>
+          <th style="width: 100px;">조회수</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="post : ${posts}">
+          <!-- 번호 -->
+          <td th:text="${post.id}">1</td>
+
+          <!-- 제목 + (오른쪽에) 수정/삭제 버튼 -->
+          <td>
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- 제목 링크 -->
+              <a th:href="@{|/posts/${post.id}/posts-form|}"
+                 th:text="${post.title}">
+                게시글 제목
+              </a>
+
+              <!-- 🔹 로그인 + 작성자 본인일 때만 버튼 노출 -->
+              <div th:if="${loggedIn and memberPrincipalId == post.memberId}"
+                   class="d-inline-flex gap-1 ms-2">
+
+                <!-- 수정 버튼 -->
+                <form th:action="@{|/posts/${post.id}/posts-edit-form|}" method="get"
+                      class="m-0 d-inline-block">
+                  <button type="submit" class="btn btn-outline-primary btn-sm">
+                    수정
+                  </button>
+                </form>
+
+                <!-- 삭제 버튼 -->
+                <form th:action="@{|/posts/${post.id}|}" method="post"
+                      class="m-0 d-inline-block"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                  <input type="hidden" name="_method" value="delete"/>
+                  <button type="submit" class="btn btn-outline-danger btn-sm">
+                    삭제
+                  </button>
+                </form>
+              </div>
+            </div>
+          </td>
+
+          <!-- 작성자 -->
+          <td>
+            <div th:text="${post.memberName}">
+              작성자
+            </div>
+          </td>
+
+          <!-- 좋아요 / 조회수 -->
+          <td th:text="${post.likeCount}">0</td>
+          <td th:text="${post.viewCount}">0</td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+  </body>
+</html>
