@@ -4,8 +4,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
 
     <title th:text="${post.title}">게시글 상세</title>
 
@@ -19,7 +23,9 @@
         const postId = /*[[${post.id}]]*/ 0;
 
         const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+        const csrfHeaderMeta = document.querySelector(
+          'meta[name="_csrf_header"]'
+        );
         const csrfToken = csrfTokenMeta ? csrfTokenMeta.content : null;
         const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : null;
 
@@ -79,14 +85,11 @@
                 headers[csrfHeader] = csrfToken;
               }
 
-              const response = await fetch(
-                `/api/comments/${commentId}`,
-                {
-                  method: "PATCH",
-                  headers,
-                  body: JSON.stringify({ content: newContent }),
-                }
-              );
+              const response = await fetch(`/api/comments/${commentId}`, {
+                method: "PATCH",
+                headers,
+                body: JSON.stringify({ content: newContent }),
+              });
 
               if (!response.ok) {
                 alert("댓글 수정에 실패했습니다.");
@@ -131,24 +134,28 @@
         <div class="text-muted small">
           <span th:text="'작성자 : ' + ${post.memberName}">작성자</span>
           &nbsp;|&nbsp;
-          <span th:text="'작성일 : ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+          <span
+            th:text="'작성일 : ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"
+            >작성일</span
+          >
           &nbsp;|&nbsp;
           <span th:text="'조회수 : ' + ${post.viewCount}">조회수</span>
         </div>
       </div>
 
       <!-- 게시글 내용 -->
-      <div class="mb-4 border rounded p-3" style="min-height: 150px;">
-        <p th:utext="${#strings.replace(post.content, '\n', '<br/>')}">
-          내용
-        </p>
+      <div class="mb-4 border rounded p-3" style="min-height: 150px">
+        <p th:text="${post.content}" style="white-space: pre-wrap"></p>
       </div>
 
       <!-- 상단 버튼 영역 : 좋아요 + (작성자 전용) 수정/삭제 -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-
         <!-- 좋아요 버튼 (로그인한 경우에만 보여주고 싶으면 th:if 로 감싸기) -->
-        <form th:action="@{|/posts/${post.id}/like|}" method="post" class="d-inline">
+        <form
+          th:action="@{|/posts/${post.id}/like|}"
+          method="post"
+          class="d-inline"
+        >
           <button type="submit" class="btn btn-outline-primary">
             👍 좋아요
             <span th:text="${post.likeCount}">0</span>
@@ -157,21 +164,26 @@
 
         <!-- 작성자만: 수정/삭제 버튼 -->
         <div th:if="${isPostAuthor}">
-          <a th:href="@{|/posts/${post.id}/posts-edit-form|}" class="btn btn-secondary me-2">
+          <a
+            th:href="@{|/posts/${post.id}/posts-edit-form|}"
+            class="btn btn-secondary me-2"
+          >
             수정
           </a>
 
-          <form th:action="@{|/posts/${post.id}|}" method="post" class="d-inline">
+          <form
+            th:action="@{|/posts/${post.id}|}"
+            method="post"
+            class="d-inline"
+          >
             <!-- HiddenHttpMethodFilter 사용 시 -->
             <input type="hidden" name="_method" value="delete" />
-            <button type="submit" class="btn btn-outline-danger">
-              삭제
-            </button>
+            <button type="submit" class="btn btn-outline-danger">삭제</button>
           </form>
         </div>
       </div>
 
-      <hr/>
+      <hr />
 
       <!-- 댓글 작성 폼 -->
       <div class="mb-4">
@@ -181,8 +193,13 @@
         <div th:if="${memberPrincipalId != null}">
           <form th:action="@{|/posts/${post.id}/comments|}" method="post">
             <div class="mb-3">
-            <textarea class="form-control" name="content" rows="3"
-                      placeholder="댓글을 입력하세요" required></textarea>
+              <textarea
+                class="form-control"
+                name="content"
+                rows="3"
+                placeholder="댓글을 입력하세요"
+                required
+              ></textarea>
             </div>
             <button type="submit" class="btn btn-primary">댓글 등록</button>
           </form>
@@ -190,12 +207,13 @@
 
         <div th:if="${memberPrincipalId == null}">
           <p class="text-muted">
-            댓글을 작성하려면 <a th:href="@{/members/login-form}">로그인</a>이 필요합니다.
+            댓글을 작성하려면 <a th:href="@{/members/login-form}">로그인</a>이
+            필요합니다.
           </p>
         </div>
       </div>
 
-      <hr/>
+      <hr />
 
       <!-- 댓글 리스트 -->
       <div>
@@ -205,30 +223,41 @@
           <p class="text-muted">등록된 댓글이 없습니다.</p>
         </div>
 
-        <div th:each="comment : ${comments}"
-             class="border-bottom py-3 comment-item"
-             th:attr="data-comment-id=${comment.id}">
+        <div
+          th:each="comment : ${comments}"
+          class="border-bottom py-3 comment-item"
+          th:attr="data-comment-id=${comment.id}"
+        >
           <div class="d-flex justify-content-between">
             <div>
               <strong th:text="${comment.memberName}">작성자</strong>
-              <span class="text-muted small comment-date"
-                    th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">
-          날짜
-        </span>
+              <span
+                class="text-muted small comment-date"
+                th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"
+              >
+                날짜
+              </span>
             </div>
 
             <!-- 댓글 작성자만 수정/삭제 -->
-            <div th:if="${loggedIn != null and memberPrincipalId == comment.memberId}">
+            <div
+              th:if="${loggedIn != null and memberPrincipalId == comment.memberId}"
+            >
               <!-- 수정: JS로 inline 수정 -->
-              <button type="button"
-                      class="btn btn-sm btn-outline-secondary me-1 comment-edit-btn"
-                      th:attr="data-comment-id=${comment.id}">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary me-1 comment-edit-btn"
+                th:attr="data-comment-id=${comment.id}"
+              >
                 수정
               </button>
 
               <!-- 삭제 (페이지 방식 그대로 사용) -->
-              <form th:action="@{|/posts/${post.id}/comments/${comment.id}|}"
-                    method="post" class="d-inline">
+              <form
+                th:action="@{|/posts/${post.id}/comments/${comment.id}|}"
+                method="post"
+                class="d-inline"
+              >
                 <button type="submit" class="btn btn-sm btn-outline-danger">
                   삭제
                 </button>
@@ -239,21 +268,28 @@
           <div class="mt-2">
             <!-- 보기 모드 -->
             <div class="comment-view">
-              <p th:utext="${#strings.replace(comment.content, '\n', '<br/>')}"></p>
+              <p th:text="${comment.content}" style="white-space: pre-wrap"></p>
             </div>
 
             <!-- 수정 모드 (처음에는 숨김) -->
             <div class="comment-edit-area d-none">
-        <textarea class="form-control comment-edit-input" rows="3"
-                  th:text="${comment.content}"></textarea>
+              <textarea
+                class="form-control comment-edit-input"
+                rows="3"
+                th:text="${comment.content}"
+              ></textarea>
               <div class="mt-2">
-                <button type="button"
-                        class="btn btn-sm btn-primary comment-save-btn"
-                        th:attr="data-comment-id=${comment.id}">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary comment-save-btn"
+                  th:attr="data-comment-id=${comment.id}"
+                >
                   저장
                 </button>
-                <button type="button"
-                        class="btn btn-sm btn-secondary comment-cancel-btn">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary comment-cancel-btn"
+                >
                   취소
                 </button>
               </div>
@@ -263,9 +299,10 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
     ></script>
   </body>
 </html>
