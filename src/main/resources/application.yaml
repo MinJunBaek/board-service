@@ -3,6 +3,7 @@ spring:
   application:
     name: board-service
 
+# 아무것도 설정을 안했을때 실행
   profiles:
     default: local
 

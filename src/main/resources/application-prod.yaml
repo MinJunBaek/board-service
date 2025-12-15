@@ -5,6 +5,7 @@ spring:
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
 
+# flyway
   jpa:
     hibernate:
       ddl-auto: none   # 운영용이면 보통 none / validate 권장
