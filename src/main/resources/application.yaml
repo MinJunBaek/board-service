@@ -1,13 +1,22 @@
-# application.yaml
+# application.yaml (공통 설정)
+# 모든 프로필에 공통적으로 적용되는 설정을 정의합니다.
 spring:
   application:
-    name: board-service
-
-# 아무것도 설정을 안했을때 실행
+    name: board-service                                # 이 애플리케이션의 이름을 'board-service'로 정의
   profiles:
-    default: local
-
+    default: local                                     # 아무런 설정을 안 하면 'local' 프로파일을 기본으로 사용
   mvc:
-    hiddenmethod:
+    hidden method:
       filter:
-        enabled: true
+        enabled: true                                  # HTML 폼에서 GET/POST 외에 PUT, DELETE, PATCH 요청을 사용할 수 있게 해주는 기능
+  jpa:
+    defer-datasource-initialization: true              # JPA 엔티티를 기준으로 스키마를 생성한 후 data.sql을 실행하도록 순서를 제어합니다.
+    properties:
+      hibernate:
+        #'방언'이라는 뜻으로, JPA(Hibernate)가 여러 종류의 데이터베이스(MySQL, Oracle 등)와 소통할 때, MySQL 8 버전에 맞는 고유한 SQL 문법을 사용하도록 알려주는 설정
+        dialect: org.hibernate.dialect.MySQL8Dialect   # 모든 DB에서 공통적으로 MySQL 8 버전에 맞는 SQL을 생성하도록 명시
+
+logging:
+  level:
+    org.hibernate.SQL: debug                           # JPA가 실행하는 SQL 쿼리를 DEBUG 레벨로 로깅합니다.
+    org.hibernate.type.descriptor.sql: trace           # SQL문에 들어가는 파라미터 값(예: WHERE id = ?)을 로그로 보여줌. '?'에 뭐가 들어갔는지 볼 수 있다.

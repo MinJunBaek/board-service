@@ -1,18 +1,26 @@
+# application-prod.yaml (운영 환경)
+# 실제 서비스 환경으로, 안정성과 보안을 최우선으로 설정합니다.
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:mysql}:${MYSQL_PORT:3306}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-# flyway
   jpa:
+    # 운영 환경에서는 절대 JPA가 스키마를 건드리지 않도록 `none`으로 설정합니다. (스키마는 Flyway 등으로 별도 관리)
     hibernate:
-      ddl-auto: none   # 운영용이면 보통 none / validate 권장
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: none
+    show-sql: false             # 성능 및 로그 가독성을 위해 SQL 쿼리를 콘솔에 출력하지 않습니다.
 
 server:
-  port: 8080
+  error:
+    include-stacktrace: never   # 에러 발생 시, 내부 구현을 노출하지 않기 위해 스택 트레이스를 절대 포함하지 않습니다.
+
+logging:
+  level:
+    # 애플리케이션의 모든 로그는 INFO 레벨 이상만 기록하여 로그 양을 줄입니다.
+    io.github.minjunbaek.board: info
+    # SQL 관련 로그는 성능 저하 및 과도한 로그 생성을 막기 위해 WARN 레벨 이상만 기록합니다.
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql: warn

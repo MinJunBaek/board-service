@@ -1,15 +1,26 @@
-# application-local.yaml
+# application-local.yaml (로컬 개발 환경)
+# 내장 인메모리 H2 데이터베이스를 사용하여 외부 DB 없이 빠르게 개발하는 용도입니다.
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/h2database;MODE=MySQL;DATABASE_TO_LOWER=TRUE;
+    # 실제 DB가 아닌, H2라는 '인메모리(In-memory) DB'를 사용합니다. 'DB_CLOSE_DELAY=-1'은 JVM이 종료될 때까지 DB를 유지하는 설정입니다.
+    url: jdbc:h2:mem:H2DataBase;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver                                             # H2 DB와 통신할 때 필요한 '드라이버' 클래스
     username: sa
-    password:
+    password: ""
 
   jpa:
+    hibernate:
+      ddl-auto: update                      # 앱 실행 시 내가 만든 Java 클래스(Entity)를 보고 DB 테이블의 변경분을 반영(업데이트)합니다.
+    show-sql: true                          # JPA가 실행하는 SQL 쿼리를 콘솔에 출력합니다.
     properties:
       hibernate:
-        format_sql: true
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+        format_sql: true                    # SQL 로그를 예쁘게 줄바꿈해서 보여줍니다.
+
+  sql:
+    init:
+      # 명시하기위해 작성: embedded (기본값): 임베디드 DB일 때만 실행 always: DB 종류와 상관없이 항상 실행 never: 어떤 경우에도 절대 실행하지 않음
+      mode: embedded
+
+server:
+  error:
+    include-stacktrace: always              # 에러 발생 시, 전체 에러 발생 경로(스택 트레이스)를 보여줘서 디버깅을 쉽게 도와줍니다.
