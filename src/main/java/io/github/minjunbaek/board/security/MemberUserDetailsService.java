@@ -1,7 +1,5 @@
 package io.github.minjunbaek.board.security;
 
-import io.github.minjunbaek.board.common.error.MemberErrorCode;
-import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.member.repository.MemberRepository;
 import io.github.minjunbaek.board.domain.member.repository.entity.Member;
 import lombok.RequiredArgsConstructor;
