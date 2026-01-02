@@ -1,8 +1,5 @@
 package io.github.minjunbaek.board.domain.post.controller;
 
-import io.github.minjunbaek.board.common.error.CommonErrorCode;
-import io.github.minjunbaek.board.common.error.MemberErrorCode;
-import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
 import io.github.minjunbaek.board.domain.comment.controller.dto.CommentResponseDto;
@@ -11,6 +8,7 @@ import io.github.minjunbaek.board.domain.post.controller.dto.PostRequestDto;
 import io.github.minjunbaek.board.domain.post.controller.dto.PostResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+@Validated
 @Controller
 @RequiredArgsConstructor
 public class PostPageController {
@@ -34,7 +33,7 @@ public class PostPageController {
   // 게시글 등록 폼으로 이동
   @GetMapping("/boards/{boardId}/posts-form")
   public String createPostForm(
-      @PathVariable(name = "boardId") Long boardId, Model model) {
+      @PathVariable(name = "boardId") @Min(value = 1, message = "1 이상이어야 합니다") Long boardId, Model model) {
 
     // 내용
     BoardResponseDto board = boardService.readBoard(boardId);
@@ -48,7 +47,7 @@ public class PostPageController {
   @PostMapping("/posts")
   public String createPost(
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-      @Validated PostRequestDto form // ★ @RequestBody 안 붙임 (폼 전송)
+      @Validated PostRequestDto form // @RequestBody 안 붙임 (폼 전송)
   ) {
     Long memberId = memberPrincipal.getId();
     Long postId = postService.createPost(memberId, form);
@@ -60,7 +59,7 @@ public class PostPageController {
   // 게시글 상세 조회 폼으로 이동
   @GetMapping("/posts/{postId}/posts-form")
   public String viewPost(
-      @PathVariable(name = "postId") Long postId,
+      @PathVariable(name = "postId") @Min(value = 1, message = "1 이상이어야 합니다") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model
   ) {
@@ -87,7 +86,7 @@ public class PostPageController {
   // 게시글 수정 폼으로 이동
   @GetMapping("/posts/{postId}/posts-edit-form")
   public String editPostForm(
-      @PathVariable(name = "postId") Long postId,
+      @PathVariable(name = "postId") @Min(value = 1, message = "1 이상이어야 합니다") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       Model model) {
 
@@ -112,7 +111,7 @@ public class PostPageController {
   // 게시글 수정
   @PatchMapping("/posts/{postId}")
   public String editPost(
-      @PathVariable(name = "postId") Long postId,
+      @PathVariable(name = "postId") @Min(value = 1, message = "1 이상이어야 합니다") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal,
       @Validated PostRequestDto postRequestDto
   ) {
@@ -122,10 +121,9 @@ public class PostPageController {
   }
 
   // 게시글 삭제
-  // @PostMapping("/boards/{boardId}/posts/{postId}")
   @DeleteMapping("/posts/{postId}")
   public String deletePost(
-      @PathVariable(name = "postId") Long postId,
+      @PathVariable(name = "postId") @Min(value = 1, message = "1 이상이어야 합니다") Long postId,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
 
     Long memberId = memberPrincipal.getId();

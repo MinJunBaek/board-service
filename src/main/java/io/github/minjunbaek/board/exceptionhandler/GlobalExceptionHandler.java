@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * @Valid / @Validated 바인딩 실패 (DTO 필드 검증)
+   * @Valid / @Validated 바인딩 실패 (JSON 본문을 DTO 객체로 변환 후, 그 객체의 필드를 검증)
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Api<Map<String, String>>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * RequestParam, PathVariable 등에서의 검증 실패
+   * RequestParam, PathVariable (요청의 파라미터나 경로 변수 값 자체를 직접 검증)
    */
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<Api<String>> handleConstraintViolation(ConstraintViolationException e) {
