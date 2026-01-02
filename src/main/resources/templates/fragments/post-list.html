@@ -5,9 +5,8 @@
     <meta charset="UTF-8" />
   </head>
   <body>
-
     <!-- 게시글 목록 공통 Fragment -->
-    <div th:fragment="postList(posts, loggedIn, memberPrincipalId)">
+    <div th:fragment="postList(postsPage, posts, loggedIn, memberPrincipalId, url)">
 
       <!-- 게시글이 없는 경우 -->
       <div class="alert alert-info" th:if="${#lists.isEmpty(posts)}">
@@ -30,7 +29,6 @@
         <tr th:each="post : ${posts}">
           <!-- 번호 -->
           <td th:text="${post.id}">1</td>
-
           <!-- 제목 + (오른쪽에) 수정/삭제 버튼 -->
           <td>
             <div class="d-flex justify-content-between align-items-center">
@@ -43,7 +41,6 @@
               <!-- 🔹 로그인 + 작성자 본인일 때만 버튼 노출 -->
               <div th:if="${loggedIn and memberPrincipalId == post.memberId}"
                    class="d-inline-flex gap-1 ms-2">
-
                 <!-- 수정 버튼 -->
                 <form th:action="@{|/posts/${post.id}/posts-edit-form|}" method="get"
                       class="m-0 d-inline-block">
@@ -75,11 +72,39 @@
           <!-- 좋아요 / 조회수 -->
           <td th:text="${post.likeCount}">0</td>
           <td th:text="${post.viewCount}">0</td>
+
         </tr>
         </tbody>
       </table>
 
-    </div>
+      <!-- ===== 페이지네이션 ===== -->
+      <nav th:if="${postsPage != null and postsPage.totalPages > 1}"
+           th:with="start=${T(java.lang.Math).floor(postsPage.number/10)*10 + 1},
+           end=(${start + 9 < postsPage.totalPages ? start + 9 : postsPage.totalPages})"
+           aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
 
+          <!-- 이전 페이지 버튼: 첫 페이지일 경우 비활성화 -->
+          <li class="page-item" th:classappend="${postsPage.first} ? 'disabled'">
+            <a class="page-link" th:href="@{${url}(page=${postsPage.number - 1})}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <!-- 페이지 번호 링크들: start부터 end까지 숫자를 반복하며 링크 생성 -->
+          <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}"
+              th:classappend="${page == postsPage.number + 1} ? 'active'">
+            <a class="page-link" th:text="${page}" th:href="@{${url}(page=${page - 1})}"></a>
+          </li>
+
+          <!-- 다음 페이지 버튼: 마지막 페이지일 경우 비활성화 -->
+          <li class="page-item" th:classappend="${postsPage.last} ? 'disabled'">
+            <a class="page-link" th:href="@{${url}(page=${postsPage.number + 1})}" aria-label="Next">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </body>
 </html>

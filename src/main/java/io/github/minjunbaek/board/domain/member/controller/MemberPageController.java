@@ -14,8 +14,11 @@ import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -146,11 +149,13 @@ public class MemberPageController {
   }
 
   @GetMapping("/me/posts")
-  public String viewMyPostList(@AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
+  public String viewMyPostList(
+      @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+      @AuthenticationPrincipal MemberPrincipal memberPrincipal, Model model) {
 
     Long memberId = memberPrincipal.getId();
-    List<PostListResponseDto> posts = postService.readAllMemberPost(memberId);
-    model.addAttribute("posts", posts);
+    Page<PostListResponseDto> postsPage = postService.readAllMemberPost(pageable, memberId);
+    model.addAttribute("postsPage", postsPage);
 
     return "members/my-posts-form";
   }

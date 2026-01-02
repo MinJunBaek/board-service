@@ -1,6 +1,6 @@
 package io.github.minjunbaek.board.domain.post.service;
 
-import io.github.minjunbaek.board.common.error.BoardErrorCode;
+import io.github.minjunbaek.board.common.error.BoardServiceErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.board.repository.entity.Board;
 import io.github.minjunbaek.board.domain.board.service.BoardService;
@@ -11,8 +11,9 @@ import io.github.minjunbaek.board.domain.post.controller.dto.PostRequestDto;
 import io.github.minjunbaek.board.domain.post.controller.dto.PostResponseDto;
 import io.github.minjunbaek.board.domain.post.repository.PostRepository;
 import io.github.minjunbaek.board.domain.post.repository.entity.Post;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,33 +47,37 @@ public class PostService {
 
   // 특정 사용자의 게시글 다수 조회
   @Transactional(readOnly = true)
-  public List<PostListResponseDto> readAllMemberPost(Long memberId) {
-    List<PostListResponseDto> postResponseDtoList = postRepository.findAllWithMemberByMemberId(memberId).stream()
-        .map(post -> PostListResponseDto.of(
+  public Page<PostListResponseDto> readAllMemberPost(Pageable pageable, Long memberId) {
+    Page<Post> postResponseDtoList = postRepository.findAllWithMemberByMemberId(pageable, memberId);
+
+    Page<PostListResponseDto> postsPage = postResponseDtoList.map(post -> PostListResponseDto.of(
             post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getId(),
-            post.getMember().getName())).toList();
-    return postResponseDtoList;
+            post.getMember().getName()));
+    return postsPage;
   }
 
   // 특정 게시판의 게시글 다수 조회
   @Transactional(readOnly = true)
-  public List<PostListResponseDto> readAllPost(Long boardId) {
+  public Page<PostListResponseDto> readAllPost(Pageable pageable, Long boardId) {
     boardService.findBoard(boardId);
 
-    List<Post> postList = postRepository.findAllWithMemberByBoardId(boardId);
+    Page<Post> postsPage = postRepository.findAllWithMemberByBoardId(pageable, boardId);
 
-    List<PostListResponseDto> postResponseDtoList = postList.stream()
-        .map(post -> PostListResponseDto.of(
+    Page<PostListResponseDto> postResponseDtoList = postsPage.map(post -> PostListResponseDto.of(
             post.getId(), post.getTitle(), post.getLikeCount(), post.getViewCount(), post.getMember().getId(),
-            post.getMember().getName())).toList();
+            post.getMember().getName()));
     return postResponseDtoList;
   }
 
   // 전체 게시글 다수 조회
   @Transactional(readOnly = true)
-  public List<PostListResponseDto> readAllPost() {
-    return postRepository.findAllWithMember().stream().map(post -> PostListResponseDto.of(post.getId(), post.getTitle(),
-        post.getLikeCount(), post.getViewCount(), post.getMember().getId(), post.getMember().getName())).toList();
+  public Page<PostListResponseDto> readAllPost(Pageable pageable) {
+    Page<Post> posts = postRepository.findAllWithMember(pageable);
+
+    Page<PostListResponseDto> responseDtoPage = posts.map(post -> PostListResponseDto.of(post.getId(), post.getTitle(),
+        post.getLikeCount(), post.getViewCount(), post.getMember().getId(), post.getMember().getName()));
+
+    return responseDtoPage;
   }
 
   // 게시글 수정용 조회(단일 조회)
@@ -115,14 +120,14 @@ public class PostService {
   // 해당 게시글 찾기
   public Post findPost(Long postId) {
     Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new ApiException(BoardErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> new ApiException(BoardServiceErrorCode.POST_NOT_FOUND));
     return post;
   }
 
   // 수정 권한 확인
   private void postPermissionCheck(Long postMemberId, Long memberId){
     if (!postMemberId.equals(memberId)) {
-      throw new ApiException(BoardErrorCode.POST_NO_PERMISSION);
+      throw new ApiException(BoardServiceErrorCode.POST_NO_PERMISSION);
     }
   }
 }

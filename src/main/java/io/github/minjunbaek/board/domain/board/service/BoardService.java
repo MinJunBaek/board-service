@@ -1,6 +1,6 @@
 package io.github.minjunbaek.board.domain.board.service;
 
-import io.github.minjunbaek.board.common.error.BoardErrorCode;
+import io.github.minjunbaek.board.common.error.BoardServiceErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardRequestDto;
 import io.github.minjunbaek.board.domain.board.controller.dto.BoardResponseDto;
@@ -22,6 +22,9 @@ public class BoardService {
 
   // 게시판 생성
   public Long createBoard(BoardRequestDto requestDto) {
+    if (boardRepository.existsByBoardName(requestDto.getBoardName())) { // 게시판 이름 중복 방지
+      throw new ApiException(BoardServiceErrorCode.DUPLICATE_BOARD_NAME);
+    }
     Board board = Board.create(requestDto.getBoardName());
     boardRepository.save(board);
     return board.getId();
@@ -43,9 +46,14 @@ public class BoardService {
     return boardList;
   }
 
-  // 게시판 수정 ==> 게시판 수정시 중복체크가 필요할듯 하다
+  // 게시판 수정
   public BoardResponseDto editBoard(Long boardId, BoardRequestDto requestDto) {
     Board board = findBoard(boardId);
+    if (!board.getBoardName().equals(requestDto.getBoardName())) {         // 기존 이름과 중복 여부 확인 다르면 아래 로직 실행
+      if (boardRepository.existsByBoardName(requestDto.getBoardName())) {  // DB에서 게시판 이름 중복 확인
+        throw new ApiException(BoardServiceErrorCode.DUPLICATE_BOARD_NAME);
+      }
+    }
     board.changeBoardName(requestDto.getBoardName());
     return BoardResponseDto.of(board.getId(), board.getBoardName());
   }
@@ -59,7 +67,7 @@ public class BoardService {
   // 중복되는 Board를 조회하는 로직을 따로 구현
   public Board findBoard(Long boardId) {
     Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new ApiException(BoardErrorCode.BOARD_NOT_FOUND));
+        .orElseThrow(() -> new ApiException(BoardServiceErrorCode.BOARD_NOT_FOUND));
     return board;
   }
 }

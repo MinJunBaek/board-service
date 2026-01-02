@@ -9,6 +9,10 @@ import io.github.minjunbaek.board.domain.post.service.PostService;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,8 +72,10 @@ public class BoardApiController {
 
   // 게시판의 게시글 목록 조회
   @GetMapping("/{boardId}/posts")
-  public ResponseEntity<Api<List<PostListResponseDto>>> viewPosts(@PathVariable(value = "boardId") Long boardId) {
-    List<PostListResponseDto> postListResponseDtos = postService.readAllPost(boardId);
-    return ResponseEntity.ok(Api.success("VIEW_POST_LIST", "게시글 목록 조회", postListResponseDtos));
+  public ResponseEntity<Api<Page<PostListResponseDto>>> viewPosts(
+      @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+      @PathVariable(value = "boardId") Long boardId) {
+    Page<PostListResponseDto> postsPageResponseDtos = postService.readAllPost(pageable, boardId);
+    return ResponseEntity.ok(Api.success("VIEW_POST_LIST", "게시글 목록 조회", postsPageResponseDtos));
   }
 }

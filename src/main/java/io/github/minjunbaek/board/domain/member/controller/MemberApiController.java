@@ -11,8 +11,11 @@ import io.github.minjunbaek.board.domain.post.service.PostService;
 import io.github.minjunbaek.board.security.MemberPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -85,13 +88,14 @@ public class MemberApiController {
 
   // 내가 쓴 게시글 목록 조회
   @GetMapping("/me/posts")
-  public ResponseEntity<Api<List<PostListResponseDto>>> viewMemberPosts(
+  public ResponseEntity<Api<Page<PostListResponseDto>>> viewMemberPosts(
+      @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
       @AuthenticationPrincipal MemberPrincipal memberPrincipal
   ) {
 
-    List<PostListResponseDto> postListResponseDto = postService.readAllMemberPost(memberPrincipal.getId());
+    Page<PostListResponseDto> postsPage = postService.readAllMemberPost(pageable, memberPrincipal.getId());
 
-    return ResponseEntity.ok(Api.success("VIEW_MY_POST_LIST", "사용자 게시글 목록 조회", postListResponseDto));
+    return ResponseEntity.ok(Api.success("VIEW_MY_POST_LIST", "사용자 게시글 목록 조회", postsPage));
   }
 
   // 아이디 및 패스워드 찾기

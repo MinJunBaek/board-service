@@ -1,6 +1,6 @@
 package io.github.minjunbaek.board.domain.comment.service;
 
-import io.github.minjunbaek.board.common.error.BoardErrorCode;
+import io.github.minjunbaek.board.common.error.BoardServiceErrorCode;
 import io.github.minjunbaek.board.common.exception.ApiException;
 import io.github.minjunbaek.board.domain.comment.controller.dto.CommentRequestDto;
 import io.github.minjunbaek.board.domain.comment.controller.dto.CommentResponseDto;
@@ -72,13 +72,13 @@ public class CommentService {
 
   public Comment findComment(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow(() -> new ApiException(BoardErrorCode.COMMENT_NOT_FOUND));
+        .orElseThrow(() -> new ApiException(BoardServiceErrorCode.COMMENT_NOT_FOUND));
     return comment;
   }
 
   private void permissionCheck(Comment comment, Long memberId) {
     if (!comment.getMember().getId().equals(memberId)) {
-      throw new ApiException(BoardErrorCode.COMMENT_NO_PERMISSION);
+      throw new ApiException(BoardServiceErrorCode.COMMENT_NO_PERMISSION);
     }
   }
 }

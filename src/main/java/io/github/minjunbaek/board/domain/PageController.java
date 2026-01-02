@@ -2,8 +2,11 @@ package io.github.minjunbaek.board.domain;
 
 import io.github.minjunbaek.board.domain.post.controller.dto.PostListResponseDto;
 import io.github.minjunbaek.board.domain.post.service.PostService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +18,11 @@ public class PageController {
 
   // 메인 페이지
   @GetMapping("/")
-  public String mainPage(Model model) {
-    // 전체 게시글 목록
-    List<PostListResponseDto> posts = postService.readAllPost();
-    model.addAttribute("posts", posts);
+  public String mainPage(Model model,
+      @PageableDefault(size = 10, sort = "id", direction = Direction.DESC) Pageable pageable
+  ) {
+    Page<PostListResponseDto> postsPage = postService.readAllPost(pageable);
+    model.addAttribute("postsPage", postsPage);
     return "index";
   }
 
